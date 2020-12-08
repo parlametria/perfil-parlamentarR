@@ -1,17 +1,15 @@
 #' @title Processa dados de deputados
 #' @description Processa informações sobre os deputados das legislaturas 55 e 56
+#' @param legislaturas_list Lista com ids das legislaturas. Default = 55 e 56.
 #' @return Dataframe contendo informações sobre os deputados
 #' @examples
-#' #' processa_dados_deputados()
-processa_dados_deputados <- function() {
+#' #' .processa_dados_deputados()
+.processa_dados_deputados <- function(legislaturas_list = c(55, 56)) {
   library(tidyverse)
   library(here)
   
-  # Lista das legislaturas de interesse
-  legislaturas_list <- c(55, 56)
-  
-  source(here::here("crawler/parlamentares/deputados/fetcher_deputado.R"))
-  source(here::here("crawler/votacoes/utils_votacoes.R"))
+  source(here::here("R/parlamentares/deputados/fetcher_deputado.R"))
+  source(here::here("R/votacoes/utils_votacoes.R"))
   
   deputados <- purrr::map_df(legislaturas_list, ~ fetch_deputados_with_backoff(.x))
   
@@ -30,15 +28,15 @@ processa_dados_deputados <- function() {
 
 #' @title Processa dados de senadores
 #' @description Processa informações sobre os senadores das legislaturas 55 e 56
+#' @param legislaturas_list Lista com ids das legislaturas. Default = 55 e 56.
 #' @return Dataframe contendo informações sobre os senadores
 #' @examples
-#' processa_dados_senadores()
-processa_dados_senadores <- function() {
+#' .processa_dados_senadores()
+.processa_dados_senadores <- function(legislaturas_list = c(55, 56)) {
   library(tidyverse)
   library(here)
-  source(here::here("crawler/parlamentares/senadores/fetcher_senador.R"))
+  source(here::here("R/parlamentares/senadores/fetcher_senador.R"))
   
-  legislaturas_list <- c(55, 56)
   senadores <- purrr::map_df(legislaturas_list, ~ fetch_senadores_legislatura(.x))
   
   senadores_em_exercicio <- fetch_senadores_atuais(legislatura_atual = 56)
@@ -65,19 +63,41 @@ processa_dados_senadores <- function() {
 
 #' @title Processa dados de parlamentares
 #' @description Processa informações sobre os parlamentares da legislatura atual
+#' @param casa Casa (câmara ou senado) para retornar os dados. Se nenhuma for passada,
+#' a função retornará dados de ambas.
+#' @param legislaturas_list Lista com ids das legislaturas. Default = 55 e 56.
 #' @return Dataframe contendo informações sobre os parlamentares (deputados e senadores)
 #' @examples
-#' processa_dados_parlamentares()
-processa_dados_parlamentares <- function() {
-  deputados <- processa_dados_deputados() %>% 
-    ungroup()
+#' processa_dados_parlamentares("camara", c(56))
+#' processa_dados_parlamentares("senado", c(55))
+#' @export
+processa_dados_parlamentares <- function(casa = NULL, legislaturas_list = c(55, 56)) {
   
-  senadores <- processa_dados_senadores() %>% 
-    ungroup()
+  library(tidyverse)
   
-  parlamentares <- deputados %>% 
-    rbind(senadores)
-  
-  return(parlamentares)
+  if (is.null(casa)) {
+    deputados <- .processa_dados_deputados(legislaturas_list) %>% 
+      ungroup()
+    
+    senadores <- .processa_dados_senadores(legislaturas_list) %>% 
+      ungroup()
+    
+    parlamentares <- deputados %>% 
+      rbind(senadores)
+    
+    return(parlamentares)
+    
+  } else if (tolower(casa) == "camara") {
+    return(.processa_dados_deputados(legislaturas_list) %>% 
+      ungroup())
+    
+  } else if (tolower(casa) == "senado") {
+    return(.processa_dados_senadores(legislaturas_list) %>% 
+      ungroup())
+    
+  } else {
+    stop("Argumento 'casa' inválido.")
+  }
+
 }
 
