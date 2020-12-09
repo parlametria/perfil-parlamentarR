@@ -14,8 +14,6 @@ fetch_cargos_mesa_camara <- function(legislatura = 56, atual_cargo = TRUE) {
     message("Aviso: parâmetro atual_cargo tem valor TRUE. Valor da legislatura utilizado será 56 (atual).")
   }
   
-  source(here::here("R/utils/utils.R"))
-  
   url <- paste0("https://dadosabertos.camara.leg.br/api/v2/legislaturas/", legislatura, "/mesa")
   
   dados_raw <- (RCurl::getURL(url) %>% 
