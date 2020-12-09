@@ -4,7 +4,10 @@
 #' @return Dataframe informações de id e nome civil.
 #' @examples
 #' deputado <- fetch_deputado(73874)
+#' @export
 fetch_deputado <- function(id_deputado) {
+  library(tidyverse)
+  
   print(paste0("Baixando informações do deputado de id ", id_deputado, "..."))
   url <- paste0("https://dadosabertos.camara.leg.br/api/v2/deputados/", id_deputado)
   deputado <- tryCatch({
@@ -27,7 +30,7 @@ fetch_deputado <- function(id_deputado) {
     
     data <- data %>% 
       dplyr::bind_cols(
-        extract_partido_informations(data$dados.ultimoStatus.uriPartido)) %>% 
+        .extract_partido_informations(data$dados.ultimoStatus.uriPartido)) %>% 
       mutate(casa = "camara") %>% 
       select(id = dados.id, 
              casa,
@@ -57,35 +60,13 @@ fetch_deputado <- function(id_deputado) {
   return(deputado)
 }
 
-#' @title Importa dados de todos os deputados de uma legislatura específica
-#' @description Importa os dados de todos os deputados federais de uma legislatura específica
-#' @return Dataframe contendo informações dos deputados: id, nome civil e cpf
-#' @examples
-#' deputados <- fetch_deputados(56)
-fetch_deputados <- function(legislatura = 56) {
-  url <- paste0("https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=", legislatura)
-  
-  ids_deputados <- 
-    (RCurl::getURL(url) %>%
-       jsonlite::fromJSON())$dados %>% 
-    select(id) %>% distinct()
-  
-  info_pessoais <- do.call("rbind", lapply(ids_deputados$id, 
-                                           fetch_deputado))
-  return(info_pessoais %>% 
-           unique() %>% 
-           mutate_if(is.factor, as.character) %>% 
-           mutate(id = as.integer(id),
-                  legislatura = legislatura))
-}
-
 #' @title Extrai informações de um partido a partir de uma URL
 #' @description Recebe uma URL da câmara que possui o formato '/partidos/:num e extrai id e nome
 #' @param URL no formato "https://dadosabertos.camara.leg.br/api/v2/partidos/:num"
 #' @return Dataframe contendo informações de id e nome dos partidos
 #' @examples
-#' extract_partido_informations("https://dadosabertos.camara.leg.br/api/v2/partidos/36835")
-extract_partido_informations <- function(url) {
+#' .extract_partido_informations("https://dadosabertos.camara.leg.br/api/v2/partidos/36835")
+.extract_partido_informations <- function(url) {
   partido <- tryCatch({
     data <-  RCurl::getURL(url) %>% 
       jsonlite::fromJSON() %>% 
@@ -102,32 +83,6 @@ extract_partido_informations <- function(url) {
   return (partido)
 }
 
-#' @title Importa dados de todos os deputados de uma legislatura específica utilizando backoff exponencial
-#' @description Importa os dados de todos os deputados federais de uma legislatura específica 
-#' utilizando backoff exponencial com 10 tentativas 
-#' @return Dataframe contendo informações dos deputados: id, nome civil e cpf
-#' @examples
-#' deputados <- fetch_deputados_with_backoff(56)
-fetch_deputados_with_backoff <- function(legislatura = 56) {
-  library(tidyverse)
-  url <- paste0("https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=", legislatura)
-  
-  ids_deputados <- 
-    (RCurl::getURL(url) %>%
-       jsonlite::fromJSON())$dados %>% 
-    select(id) %>% distinct() %>% 
-   rowid_to_column(var = 'indice')
-  
-  info_pessoais <- 
-    purrr::map_df(ids_deputados$id, ~ fetch_deputado_with_backoff(.x))
-    
-  return(info_pessoais %>% 
-           unique() %>% 
-           mutate_if(is.factor, as.character) %>% 
-           mutate(id = as.integer(id),
-                  legislatura = legislatura))
-}
-
 #' @title Baixa dados dos deputados utilizando backoff exponencial
 #' @description Baixa nome civil dos deputados pelo id do parlamentar na Câmara utilizando backoff exponencial
 #' com N tentativas (10 por padrão)
@@ -135,13 +90,15 @@ fetch_deputados_with_backoff <- function(legislatura = 56) {
 #' @return Dataframe informações de id e nome civil.
 #' @examples
 #' deputado <- fetch_deputado_with_backoff(73874)
+#' @export
 fetch_deputado_with_backoff <- function(id_deputado, max_attempts = 10) {
+  library(tidyverse)
   print(paste0("Baixando informações do deputado de id ", id_deputado, "..."))
   url <- paste0("https://dadosabertos.camara.leg.br/api/v2/deputados/", id_deputado)
   
   
   for (attempt_i in seq_len(max_attempts)) {
-  
+    
     deputado <- tryCatch({
       data <-  RCurl::getURL(url) %>% 
         jsonlite::fromJSON() %>% 
@@ -162,7 +119,7 @@ fetch_deputado_with_backoff <- function(id_deputado, max_attempts = 10) {
       
       data <- data %>% 
         dplyr::bind_cols(
-          extract_partido_informations(data$dados.ultimoStatus.uriPartido)) %>% 
+          .extract_partido_informations(data$dados.ultimoStatus.uriPartido)) %>% 
         mutate(casa = "camara") %>% 
         select(id = dados.id, 
                casa,
@@ -199,4 +156,54 @@ fetch_deputado_with_backoff <- function(id_deputado, max_attempts = 10) {
   }
   
   return(deputado)
+}
+
+#' @title Importa dados de todos os deputados de uma legislatura específica
+#' @description Importa os dados de todos os deputados federais de uma legislatura específica
+#' @return Dataframe contendo informações dos deputados: id, nome civil e cpf
+#' @examples
+#' deputados <- fetch_deputados_legislatura(56)
+#' @export
+fetch_deputados_legislatura <- function(legislatura = 56) {
+  url <- paste0("https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=", legislatura)
+  
+  ids_deputados <- 
+    (RCurl::getURL(url) %>%
+       jsonlite::fromJSON())$dados %>% 
+    select(id) %>% distinct()
+  
+  info_pessoais <- do.call("rbind", lapply(ids_deputados$id, 
+                                           perfilparlamentar::fetch_deputado))
+  return(info_pessoais %>% 
+           unique() %>% 
+           mutate_if(is.factor, as.character) %>% 
+           mutate(id = as.integer(id),
+                  legislatura = legislatura))
+}
+
+#' @title Importa dados de todos os deputados de uma legislatura específica utilizando backoff exponencial
+#' @description Importa os dados de todos os deputados federais de uma legislatura específica 
+#' utilizando backoff exponencial com 10 tentativas 
+#' @return Dataframe contendo informações dos deputados: id, nome civil e cpf
+#' @examples
+#' deputados <- fetch_deputados_with_backoff_legislatura(56)
+#' @export
+fetch_deputados_with_backoff_legislatura <- function(legislatura = 56) {
+  library(tidyverse)
+  url <- paste0("https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=", legislatura)
+  
+  ids_deputados <- 
+    (RCurl::getURL(url) %>%
+       jsonlite::fromJSON())$dados %>% 
+    select(id) %>% distinct() %>% 
+    rowid_to_column(var = 'indice')
+  
+  info_pessoais <- 
+    purrr::map_df(ids_deputados$id, ~ perfilparlamentar::fetch_deputado_with_backoff(.x))
+  
+  return(info_pessoais %>% 
+           unique() %>% 
+           mutate_if(is.factor, as.character) %>% 
+           mutate(id = as.integer(id),
+                  legislatura = legislatura))
 }

@@ -4,6 +4,7 @@
 #' @return Dataframe contendo informações dos senadores: id, nome civil, uf, partido, genero, dentre outras
 #' @examples
 #' senadores <- fetch_senadores_legislatura(56)
+#' @export
 fetch_senadores_legislatura <- function(legislatura = 56) {
   library(tidyverse)
   
@@ -35,7 +36,7 @@ fetch_senadores_legislatura <- function(legislatura = 56) {
     
     dados_senador <- pmap_dfr(
       list(data %>% distinct(id) %>% pull(id)),
-      ~ fetch_info_por_senador(..1)) %>% 
+      ~ fetch_senador(..1)) %>% 
       select(id, data_nascimento)
     
     data <- data %>% 
@@ -58,9 +59,10 @@ fetch_senadores_legislatura <- function(legislatura = 56) {
 #' @return Dataframe contendo informações dos senadores: id, nome eleitoral, legislatura atual
 #' @examples
 #' senadores <- fetch_senadores_atuais()
+#' @export
 fetch_senadores_atuais <- function(legislatura_atual = 56) {
   library(tidyverse)
-    
+  
   url <- paste0("http://legis.senado.leg.br/dadosabertos/senador/lista/atual")
   
   senadores <- tryCatch({
@@ -91,11 +93,12 @@ fetch_senadores_atuais <- function(legislatura_atual = 56) {
 #' @param id_senador ID do senador na API de dados abertos do Senado
 #' @return Dataframe contendo informações do senador como nome e data de nascimento
 #' @examples
-#' contarato <- fetch_info_por_senador(5953)
-fetch_info_por_senador <- function(id_senador) {
+#' contarato <- fetch_senador(5953)
+#' @export
+fetch_senador <- function(id_senador) {
   library(tidyverse)
   
-  print(paste0("Baixando informações do Senador ", id_senador))
+  print(paste0("Baixando informações do senador de id ", id_senador, "..."))
   url <- paste0("http://legis.senado.leg.br/dadosabertos/senador/", id_senador)
   
   senador <- tryCatch({

@@ -3,10 +3,10 @@
 #' @param cargo Cargo para padronização
 #' @return String com Nome Padronizado
 #' @examples
-#' padroniza_cargo_comissao("Titular")
-padroniza_cargo_comissao <- function(cargo) {
+#' .padroniza_cargo_comissao("Titular")
+.padroniza_cargo_comissao <- function(cargo) {
   library(tidyverse)
-  source(here::here("crawler/parlamentares/comissoes/constants/cargos.R"))
+  source(here::here("R/utils/constants/cargos.R"))
   
   cargo_padronizado = dplyr::case_when(tolower(cargo) == tolower(.PRESIDENTE) ~ "Presidente",
                                        tolower(cargo) == tolower(.VICE_PRESIDENTE) ~ "Vice-presidente",
@@ -25,10 +25,10 @@ padroniza_cargo_comissao <- function(cargo) {
 #' @param situacao Situação do parlamentar na Comissão
 #' @return Valor atribuído ao cargo
 #' @examples
-#' enumera_cargo_comissao("Titular")
-enumera_cargo_comissao <- function(cargo, situacao) {
+#' .enumera_cargo_comissao("Titular")
+.enumera_cargo_comissao <- function(cargo, situacao) {
   library(tidyverse)
-  source(here::here("crawler/parlamentares/comissoes/constants/cargos.R"))    
+  source(here::here("R/utils/constants/cargos.R"))    
 
   peso = dplyr::case_when(tolower(cargo) == tolower(.PRESIDENTE) ~ 7,
                           tolower(cargo) == tolower(.VICE_PRESIDENTE) ~ 6,
@@ -43,22 +43,56 @@ enumera_cargo_comissao <- function(cargo, situacao) {
   return(peso)
 }
 
+#' @title Recupera informações da Comissão
+#' @description Utiliza o rcongresso para recuperar informações sobre uma Comissão específica
+#' @param sigla Sigla da Comissão
+#' @return Dataframe com informações da Comissão
+#' @examples
+#' fetch_comissao_info("CCJC", "camara")
+#' @export
+fetch_comissao_info <- function(sigla, casa) {
+  source(here::here("R/fetcher_comissoes_camara.R"))
+  source(here::here("R/fetcher_comissoes_senado.R"))
+  
+  if (tolower(casa) == "camara") {
+    return(fetch_comissao_info_camara(sigla))
+  } else if (tolower(casa) == "senado") {
+    return(fetch_comissao_info_senado(sigla))
+  } else {
+    stop("Argumento 'casa' inválido.")
+  }
+}
+
 #' @title Recupera informações das Comissões e de suas composições
 #' @description Retorna dados de Comissões da Câmara dos Deputados e também suas composições
 #' @return Lista com dois Dataframes: comissões e composição das comissões
 #' @examples
 #' processa_comissoes()
-processa_comissoes <- function() {
+#' @export
+processa_comissoes_e_composicoes <- function(casa = NULL) {
   library(tidyverse)
   library(here)
-  source(here::here("crawler/parlamentares/comissoes/fetcher_comissoes.R"))
   
-  comissao_composicao_camara <- fetch_comissoes_composicao_camara()
+  source(here::here("R/fetcher_comissoes_camara.R"))
+  source(here::here("R/fetcher_comissoes_senado.R"))
   
-  comissao_composicao_senado <- fetch_comissoes_composicao_senado()
-  
-  comissao_composicao <- comissao_composicao_camara %>% 
-    rbind(comissao_composicao_senado)
+  if (is.null(casa)) {
+    comissao_composicao_camara <- fetch_comissoes_composicao_camara()
+    
+    comissao_composicao_senado <- fetch_comissoes_composicao_senado()
+    
+    comissao_composicao <- comissao_composicao_camara %>% 
+      rbind(comissao_composicao_senado)
+    
+  } else if (tolower(casa) == "camara") {
+    comissao_composicao <- fetch_comissoes_composicao_camara()
+    
+  } else if (tolower(casa) == "senado") {
+    comissao_composicao <- fetch_comissoes_composicao_senado()
+    
+  } else {
+    stop("Argumento 'casa' inválido.")
+  }
   
   lista_comissao <- comissao_composicao %>% 
     dplyr::distinct(casa, sigla) %>% 
@@ -74,8 +108,8 @@ processa_comissoes <- function() {
   composicao_comissoes <- comissao_composicao %>% 
     dplyr::left_join(lista_comissao, by = c("sigla", "casa")) %>% 
     dplyr::filter(!is.na(comissao_id)) %>% 
-    dplyr::mutate(peso_cargo = enumera_cargo_comissao(tolower(cargo), tolower(situacao))) %>% 
-    dplyr::mutate(cargo = padroniza_cargo_comissao(tolower(cargo))) %>% 
+    dplyr::mutate(peso_cargo = .enumera_cargo_comissao(tolower(cargo), tolower(situacao))) %>% 
+    dplyr::mutate(cargo = .padroniza_cargo_comissao(tolower(cargo))) %>% 
     
     dplyr::group_by(comissao_id, id) %>% 
     dplyr::mutate(maximo = max(peso_cargo)) %>%
@@ -87,22 +121,6 @@ processa_comissoes <- function() {
   ## Informações das Comissões
   comissoes <- lista_comissao %>%
     dplyr::select(id = comissao_id, casa, sigla, nome = nome_comissao)
-  
-  return(list(comissoes, composicao_comissoes))
-}
-
-#' @title Recupera informações das Comissões e de suas composições
-#' @description Retorna dados de Comissões do Congresso Nacional e também suas composições
-#' @return Lista com dois Dataframes: comissões e composição das comissões
-#' @examples
-#' processa_comissoes_composicao()
-processa_comissoes_composicao <- function() {
-  library(tidyverse)
-  
-  dados_comissoes <- processa_comissoes()
-  
-  comissoes <- dados_comissoes[[1]]
-  composicao_comissoes <- dados_comissoes[[2]]
   
   return(list(comissoes, composicao_comissoes))
 }
