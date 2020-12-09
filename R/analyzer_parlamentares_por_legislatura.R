@@ -6,10 +6,6 @@
 #' #' .processa_dados_deputados()
 .processa_dados_deputados <- function(legislaturas_list = c(55, 56)) {
   library(tidyverse)
-  library(here)
-  
-  source(here::here("R/fetcher_deputados_info.R"))
-  source(here::here("R/votacoes/utils_votacoes.R"))
   
   deputados <- purrr::map_df(legislaturas_list, ~ fetch_deputados_with_backoff_legislatura(.x))
   
@@ -34,8 +30,6 @@
 #' .processa_dados_senadores()
 .processa_dados_senadores <- function(legislaturas_list = c(55, 56)) {
   library(tidyverse)
-  library(here)
-  source(here::here("R/fetcher_senadores_info.R"))
   
   senadores <- purrr::map_df(legislaturas_list, ~ fetch_senadores_legislatura(.x))
   

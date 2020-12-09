@@ -11,11 +11,11 @@
 processa_mandatos_parlamentar <- function(id_parlamentar, casa) {
   print(paste0("Baixando informações de mandatos do parlamentar de id ", id_parlamentar, " na casa ", casa, "..."))
   if (tolower(casa) == 'camara') {
-    source(here::here("R/fetcher_mandatos_camara.R"))
     return(fetch_mandatos_camara(id_parlamentar))
+    
   } else if(tolower(casa) == "senado") {
-    source(here::here("R/fetcher_mandatos_senado.R"))
     return(fetch_mandatos_senado(id_parlamentar))
+    
   } else {
     stop("Argumento 'casa' inválido.")
   }

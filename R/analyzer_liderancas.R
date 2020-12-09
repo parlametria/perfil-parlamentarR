@@ -8,9 +8,6 @@ processa_liderancas <- function(casa = NULL) {
   library(tidyverse)
   library(here)
   
-  source(here("R/fetcher_liderancas_camara.R"))
-  source(here("R/fetcher_liderancas_senado.R"))
-  
   if (is.null(casa)) {
     liderancas_camara <- .fetch_liderancas_camara()
     liderancas_senado <- .fetch_liderancas_senado()

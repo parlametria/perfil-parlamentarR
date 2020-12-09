@@ -69,9 +69,6 @@ extract_text_from_pdf_url <- function(url) {
 #' @return Dataframe com mesmo conteúdo que o passado como parâmetro.
 .check_cargos <- function(df) {
   library(tidyverse)
-  library(here)
-  
-  source(here("R/utils/constants/cargos_mesa.R"))
   
   lista_cargos <- c(.SECRETARIO_1, .SECRETARIO_2, .SECRETARIO_3, .SECRETARIO_4,
                     .VICE_PRESIDENTE_1, .VICE_PRESIDENTE_2, .PRESIDENTE, 
@@ -86,4 +83,17 @@ extract_text_from_pdf_url <- function(url) {
   } else {
     return(df)
   }
+}
+
+#' @title Extrai o texto de um nó a partir do xpath
+#' @description Recebe um nó XML e um xpath e retorna o texto do conteúdo
+#' @param node Nó do XML
+#' @param xpath Xpath onde o texto está
+#' @return Texto extraído
+extract_text_from_node <- function(node, xpath) {
+  library(tidyverse)
+  return(
+    xml2::xml_find_first(node, xpath) %>%
+      xml2::xml_text()
+  )
 }

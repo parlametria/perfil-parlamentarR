@@ -6,8 +6,6 @@
 fetch_cargos_mesa_senado <- function() {
   library(tidyverse)
   
-  source(here::here("R/utils/utils.R"))
-  
   url <- "http://legis.senado.leg.br/dadosabertos/dados/MesaSenado.xml"
   
   senadores <- tryCatch({

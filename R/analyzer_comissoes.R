@@ -6,7 +6,6 @@
 #' .padroniza_cargo_comissao("Titular")
 .padroniza_cargo_comissao <- function(cargo) {
   library(tidyverse)
-  source(here::here("R/utils/constants/cargos.R"))
   
   cargo_padronizado = dplyr::case_when(tolower(cargo) == tolower(.PRESIDENTE) ~ "Presidente",
                                        tolower(cargo) == tolower(.VICE_PRESIDENTE) ~ "Vice-presidente",
@@ -27,8 +26,7 @@
 #' @examples
 #' .enumera_cargo_comissao("Titular")
 .enumera_cargo_comissao <- function(cargo, situacao) {
-  library(tidyverse)
-  source(here::here("R/utils/constants/cargos.R"))    
+  library(tidyverse) 
 
   peso = dplyr::case_when(tolower(cargo) == tolower(.PRESIDENTE) ~ 7,
                           tolower(cargo) == tolower(.VICE_PRESIDENTE) ~ 6,
@@ -51,8 +49,6 @@
 #' fetch_comissao_info("CCJC", "camara")
 #' @export
 fetch_comissao_info <- function(sigla, casa) {
-  source(here::here("R/fetcher_comissoes_camara.R"))
-  source(here::here("R/fetcher_comissoes_senado.R"))
   
   if (tolower(casa) == "camara") {
     return(fetch_comissao_info_camara(sigla))
@@ -72,9 +68,6 @@ fetch_comissao_info <- function(sigla, casa) {
 processa_comissoes_e_composicoes <- function(casa = NULL) {
   library(tidyverse)
   library(here)
-  
-  source(here::here("R/fetcher_comissoes_camara.R"))
-  source(here::here("R/fetcher_comissoes_senado.R"))
   
   if (is.null(casa)) {
     comissao_composicao_camara <- fetch_comissoes_composicao_camara()

@@ -9,9 +9,6 @@
 #' @export
 processa_cargos_mesa <- function(casa = NULL) {
   
-  source(here::here("R/fetcher_cargos_mesa_camara.R"))
-  source(here::here("R/fetcher_cargos_mesa_senado.R"))
-  
   if (is.null(casa)) {
     cargos_camara <- fetch_cargos_mesa_camara()
     cargos_senado <- fetch_cargos_mesa_senado()

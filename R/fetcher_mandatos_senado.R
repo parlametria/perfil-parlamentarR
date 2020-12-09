@@ -8,8 +8,7 @@
 #' fetch_mandatos_senado(5322)
 fetch_mandatos_senado <- function(id_senador) {
   library(fuzzyjoin)
-  library(tidyverse)
-  source(here::here("crawler/parlamentares/mandatos/utils_mandatos.R"))
+  
   url <-
     paste0("http://legis.senado.leg.br/dadosabertos/senador/",
            id_senador,
