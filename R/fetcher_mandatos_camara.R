@@ -6,8 +6,8 @@
 #' @return Dataframe contendo informações de legislatura,
 #' data de inicio, data de fim, situacao, código e descrição da causa do fim do exercício.
 #' @examples
-#' extract_mandatos_camara(141428)
-extract_mandatos_camara <- function(id_deputado) {
+#' fetch_mandatos_camara(141428)
+fetch_mandatos_camara <- function(id_deputado) {
   url <- paste0("https://www.camara.leg.br/SitCamaraWS/Deputados.asmx/ObterDetalhesDeputado?ideCadastro=", 
                 id_deputado, "&numLegislatura=")
   

@@ -6,15 +6,18 @@
 #' @return Dataframe contendo informações de legislatura,
 #' data de inicio, data de fim, situacao, código e descrição da causa do fim do exercício.
 #' @examples
-#' extract_mandatos(141428, "camara")
-extract_mandatos <- function(id_parlamentar, casa) {
+#' processa_mandatos_parlamentar(141428, "camara")
+#' @export
+processa_mandatos_parlamentar <- function(id_parlamentar, casa) {
   print(paste0("Baixando informações de mandatos do parlamentar de id ", id_parlamentar, " na casa ", casa, "..."))
   if (tolower(casa) == 'camara') {
-    source(here::here("crawler/parlamentares/mandatos/fetcher_mandatos_camara.R"))
-    return(extract_mandatos_camara(id_parlamentar))
+    source(here::here("R/fetcher_mandatos_camara.R"))
+    return(fetch_mandatos_camara(id_parlamentar))
+  } else if(tolower(casa) == "senado") {
+    source(here::here("R/fetcher_mandatos_senado.R"))
+    return(fetch_mandatos_senado(id_parlamentar))
   } else {
-    source(here::here("crawler/parlamentares/mandatos/fetcher_mandatos_senado.R"))
-    return(extract_mandatos_senado(id_parlamentar))
+    stop("Argumento 'casa' inválido.")
   }
 }
 
@@ -25,13 +28,19 @@ extract_mandatos <- function(id_parlamentar, casa) {
 #' @return Dataframe contendo informações de legislatura,
 #' data de inicio, data de fim, situacao, código e descrição da causa do fim do exercício.
 #' @examples
-#' extract_all_mandatos(readr::read_csv(here::here("crawler/raw_data/parlamentares.csv")))
-extract_all_mandatos <- function(df_parlamentares = readr::read_csv(here::here("crawler/raw_data/parlamentares.csv"))) {
+#' processa_mandatos_parlamentares(perfilparlamentar::fetch_deputados_legislatura(56))
+#' @export
+processa_mandatos_parlamentares <- function(df_parlamentares = NULL) {
   library(tidyverse)
+  
+  if (is.null(df_parlamentares)) {
+    stop("É necessário passar um dataframe com as colunas 'id' e 'casa'.")
+  }
   
   mandatos <-
     purrr::map2_df(df_parlamentares$id, df_parlamentares$casa, 
                    ~ extract_mandatos(.x, .y)) %>% 
     distinct()
+  
   return(mandatos)
 }

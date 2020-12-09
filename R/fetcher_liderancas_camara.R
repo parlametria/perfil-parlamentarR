@@ -2,8 +2,8 @@
 #' @description Retorna um dataframe contendo os líderes, vice-líderes e representantes dos blocos e partidos na Câmara
 #' @return Dataframe contendo lideranças dos blocos e partidos na Câmara
 #' @examples
-#' liderancas <- fetch_liderancas_camara()
-fetch_liderancas_camara <- function() {
+#' liderancas <- .fetch_liderancas_camara()
+.fetch_liderancas_camara <- function() {
   library(tidyverse)
   url <-
     "https://www.camara.leg.br/SitCamaraWS/Deputados.asmx/ObterLideresBancadas"

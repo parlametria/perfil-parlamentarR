@@ -61,3 +61,29 @@ extract_text_from_pdf_url <- function(url) {
     
   return(content)
 } 
+
+#' @title Checa se cargos da mesa se encaixam na lista adotada como padrão
+#' @description avalia se cargos presentes como coluna em um dataframe se encaixam na lista adotada como padrão.
+#' Lança um erro caso seja encontrado um cargo que não se encaixe na lista de cargos possíveis.
+#' @param df Dataframe com pelo menos uma coluna chamada cargo
+#' @return Dataframe com mesmo conteúdo que o passado como parâmetro.
+.check_cargos <- function(df) {
+  library(tidyverse)
+  library(here)
+  
+  source(here("R/utils/constants/cargos_mesa.R"))
+  
+  lista_cargos <- c(.SECRETARIO_1, .SECRETARIO_2, .SECRETARIO_3, .SECRETARIO_4,
+                    .VICE_PRESIDENTE_1, .VICE_PRESIDENTE_2, .PRESIDENTE, 
+                    .SUPLENTE_SECRETARIO_1, .SUPLENTE_SECRETARIO_2, .SUPLENTE_SECRETARIO_3, .SUPLENTE_SECRETARIO_4,
+                    .SUPLENTE_1, .SUPLENTE_2, .SUPLENTE_3, .SUPLENTE_4)
+  
+  df_check <- df %>% 
+    mutate(check = if_else(cargo %in% lista_cargos, TRUE, FALSE))
+  
+  if(FALSE %in% (df_check %>% pull(check))) {
+    stop("Dataframe contém cargo de mesa inválido")
+  } else {
+    return(df)
+  }
+}

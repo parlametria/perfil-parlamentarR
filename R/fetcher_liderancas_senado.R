@@ -3,8 +3,8 @@
 #' no Senado Federal
 #' @return Dataframe contendo lideranças dos blocos e partidos no Senado Federal
 #' @examples
-#' liderancas <- fetch_liderancas_senado()
-fetch_liderancas_senado <- function() {
+#' liderancas <- .fetch_liderancas_senado()
+.fetch_liderancas_senado <- function() {
   library(tidyverse)
   library(here)
   

@@ -5,8 +5,8 @@
 #' @return Dataframe contendo informações de legislatura,
 #' data de inicio, data de fim, situacao, código e descrição da causa do fim do exercício.
 #' @examples
-#' extract_mandatos_senado(5322)
-extract_mandatos_senado <- function(id_senador) {
+#' fetch_mandatos_senado(5322)
+fetch_mandatos_senado <- function(id_senador) {
   library(fuzzyjoin)
   library(tidyverse)
   source(here::here("crawler/parlamentares/mandatos/utils_mandatos.R"))
