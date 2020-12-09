@@ -102,6 +102,7 @@ extract_text_from_node <- function(node, xpath) {
 #' @description Recebe uma sigla de partido como input e retorna seu valor padronizado
 #' @param sigla Sigla do partido
 #' @return Dataframe com sigla do partido padronizada
+#' @export
 padroniza_sigla <- function(sigla) {
   library(tidyverse)
   
