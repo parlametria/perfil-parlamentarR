@@ -35,7 +35,8 @@ Imports: here,
     dplyr (== 0.8.5),
     pdftools,
     eeptools,
-    rcongresso
+    rcongresso,
+    agoradigital
 Suggests: testthat,
     knitr,
     vistime,
