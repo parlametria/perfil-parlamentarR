@@ -129,3 +129,29 @@ padroniza_sigla <- function(sigla) {
   
   return(sigla_padronizada)
 }
+
+#' @title Recupera o título de uma proposição a partir de seu id
+#' @description Recebe o id de uma proposição na câmara e retorna seu título
+#' @param id_proposicao Id da proposição
+#' @return Título da proposicao (ex: MPV 867/2018)
+#' @examples
+#' get_sigla_by_id_camara(2190237) // "MPV 867/2018"
+#' @export
+get_sigla_by_id_camara <- function(id_proposicao) {
+  library(tidyverse)
+  library(RCurl)
+  library(xml2)
+  
+  url <- paste0("https://www.camara.leg.br/SitCamaraWS/Proposicoes.asmx/ObterProposicaoPorID?IdProp=", id_proposicao)
+  
+  xml <- getURL(url) %>%
+    read_xml()
+  
+  atributos <- xml_attrs(xml, "id") %>% 
+    as.list() %>% 
+    data.frame(stringsAsFactors = F) %>% 
+    mutate(tipo = trimws(tipo, which = c("both"))) %>% 
+    select(siglaTipo = tipo, numero, ano)
+  
+  return(atributos)
+}
