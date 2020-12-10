@@ -5,9 +5,9 @@
 #' @param end_date Data final do período de votações. Formato: "dd/mm/yyyy"
 #' @return Votações da proposição em um intervalo de tempo
 #' @examples
-#' votacoes <- fetcher_votacoes_por_intervalo_senado()
+#' votacoes <- fetch_proposicoes_votadas_senado()
 #' @export
-fetcher_votacoes_por_intervalo_senado <-
+fetch_proposicoes_votadas_senado <-
   function(initial_date = "01/02/2019",
            end_date = format(Sys.Date(), "%d/%m/%Y")) {
     library(tidyverse)
