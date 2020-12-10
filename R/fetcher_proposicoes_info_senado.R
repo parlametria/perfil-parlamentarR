@@ -66,7 +66,7 @@ fetch_all_proposicoes_votadas_em_intervalo_senado <- function(initial_date = "01
   library(tidyverse)
   
   votacoes <- 
-    fetcher_votacoes_por_intervalo_senado(initial_date, end_date) %>% 
+    fetch_proposicoes_votadas_senado(initial_date, end_date) %>% 
     select(id_proposicao) %>% unique()
   
   proposicoes <-
