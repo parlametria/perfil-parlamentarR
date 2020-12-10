@@ -6,6 +6,7 @@
 #' @param data_final Data final do intervalo (formato AAAAMMDD)
 #' @return Dataframe com lista de proposições apresentadas em um intervalo
 #' de datas.
+#' @export
 fetcher_proposicoes_em_intervalo_senado <-
   function(data_inicial = "20200311",
            data_final = gsub("-", "", Sys.Date())) {

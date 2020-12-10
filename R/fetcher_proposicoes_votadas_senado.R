@@ -6,6 +6,7 @@
 #' @return Votações da proposição em um intervalo de tempo
 #' @examples
 #' votacoes <- fetcher_votacoes_por_intervalo_senado()
+#' @export
 fetcher_votacoes_por_intervalo_senado <-
   function(initial_date = "01/02/2019",
            end_date = format(Sys.Date(), "%d/%m/%Y")) {
@@ -106,6 +107,7 @@ fetcher_votacoes_por_intervalo_senado <-
 #' @return Votações de uma proposição em um ano ou todos, caso nenhum ano seja passado como parâmetro
 #' @examples
 #' votacoes <- fetcher_votacoes_por_proposicao_senado(id_proposicao = 135251)
+#' @export
 fetcher_votacoes_por_proposicao_senado <-
   function(id_proposicao, ano = NULL) {
     library(tidyverse)
