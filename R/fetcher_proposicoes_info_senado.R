@@ -47,8 +47,8 @@ fetch_info_proposicao_senado <- function(id_proposicao) {
 #' @param ids lista de ids de proposições
 #' @return Dataframe com os dados de proposições
 #' @examples
-#' proposicoes <- fetch_all_proposicoes(ids)
-fetch_all_proposicoes <- function(ids) {
+#' proposicoes <- fetch_all_proposicoes_senado(ids)
+fetch_all_proposicoes_senado <- function(ids) {
   proposicoes <-purrr::map_df(ids, ~ fetch_info_proposicao_senado(.x))
   return(proposicoes)
 }
