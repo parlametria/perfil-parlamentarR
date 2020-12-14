@@ -242,7 +242,7 @@ process_votos_url_senado <- function(proposicoes_url = NULL) {
     proposicoes_url <- .URL_PROPOSICOES_PLENARIO_SENADO
   }
   
-  votacoes <- fetcher_votacoes_por_intervalo_senado()
+  votacoes <- fetch_proposicoes_votadas_senado()
   votos <- fetch_all_votos_senado(proposicoes_url)
   
   senadores <- read_csv(here::here("crawler/raw_data/parlamentares.csv")) %>% 

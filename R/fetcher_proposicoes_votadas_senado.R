@@ -5,8 +5,9 @@
 #' @param end_date Data final do período de votações. Formato: "dd/mm/yyyy"
 #' @return Votações da proposição em um intervalo de tempo
 #' @examples
-#' votacoes <- fetcher_votacoes_por_intervalo_senado()
-fetcher_votacoes_por_intervalo_senado <-
+#' votacoes <- fetch_proposicoes_votadas_senado()
+#' @export
+fetch_proposicoes_votadas_senado <-
   function(initial_date = "01/02/2019",
            end_date = format(Sys.Date(), "%d/%m/%Y")) {
     library(tidyverse)
@@ -106,6 +107,7 @@ fetcher_votacoes_por_intervalo_senado <-
 #' @return Votações de uma proposição em um ano ou todos, caso nenhum ano seja passado como parâmetro
 #' @examples
 #' votacoes <- fetcher_votacoes_por_proposicao_senado(id_proposicao = 135251)
+#' @export
 fetcher_votacoes_por_proposicao_senado <-
   function(id_proposicao, ano = NULL) {
     library(tidyverse)

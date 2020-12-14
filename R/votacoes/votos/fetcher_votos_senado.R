@@ -89,15 +89,14 @@ fetch_votos_por_link_votacao_senado <- function(id_proposicao, id_votacao) {
 #' votos <- fetch_all_votos_senado(.URL_PROPOSICOES_PLENARIO_SENADO)
 fetch_all_votos_senado <- function(url_proposicoes = NULL) {
   library(tidyverse)
-  source(here::here("crawler/votacoes/fetcher_votacoes_senado.R"))
   
   if (is.null(url_proposicoes)) {
-    votacoes <- fetcher_votacoes_por_intervalo_senado()
+    votacoes <- fetch_proposicoes_votadas_senado()
   } else {
     source(here::here("crawler/proposicoes/fetcher_proposicoes_senado.R"))
     proposicoes_selecionadas <- fetch_proposicoes_plenario_selecionadas_senado() %>% 
       pull(id_proposicao)
-    votacoes <- fetcher_votacoes_por_intervalo_senado() %>% 
+    votacoes <- fetch_proposicoes_votadas_senado() %>% 
       filter(id_proposicao %in% proposicoes_selecionadas)
   }
   
