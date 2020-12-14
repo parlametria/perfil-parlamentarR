@@ -6,8 +6,8 @@ Authors@R: c(
     person("Laboratório Analytics (UFCG)", , , "a@a.com", role = c("aut", "cre", "cph", "fnd")),
     person("Dado Capital", , , "a@a.com", role = c("aut", "cph", "fnd"))
     )
-URL: https://github.com/parlametria/perfil-parlamentar-dados
-BugReports: https://github.com/parlametria/perfil-parlamentar-dados/issues
+URL: https://github.com/parlametria/perfil-parlamentarR
+BugReports: https://github.com/parlametria/perfil-parlamentarR/issues
 Description: Provides parlamentarians data from
     Brazilian Congress in data frames.
 License: AGPL
