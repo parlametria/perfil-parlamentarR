@@ -6,14 +6,14 @@
 um intervalo de datas.}
 \usage{
 fetcher_proposicoes_em_intervalo_senado(
-  data_inicial = "20200311",
-  data_final = gsub("-", "", Sys.Date())
+  data_inicial = "2020-03-11",
+  data_final = Sys.Date()
 )
 }
 \arguments{
-\item{data_inicial}{Data inicial do intervalo (formato AAAAMMDD)}
+\item{data_inicial}{Data inicial do intervalo (formato AAAA-MM-DD)}
 
-\item{data_final}{Data final do intervalo (formato AAAAMMDD)}
+\item{data_final}{Data final do intervalo (formato AAAA-MM-DD)}
 }
 \value{
 Dataframe com lista de proposições apresentadas em um intervalo

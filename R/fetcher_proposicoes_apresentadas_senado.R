@@ -2,22 +2,22 @@
 #' um intervalo de datas.
 #' @description Recebe uma data inicial e uma data final, retorna as 
 #' proposições apresentadas no intervalo.
-#' @param data_inicial Data inicial do intervalo (formato AAAAMMDD)
-#' @param data_final Data final do intervalo (formato AAAAMMDD)
+#' @param data_inicial Data inicial do intervalo (formato AAAA-MM-DD)
+#' @param data_final Data final do intervalo (formato AAAA-MM-DD)
 #' @return Dataframe com lista de proposições apresentadas em um intervalo
 #' de datas.
 #' @export
 fetcher_proposicoes_em_intervalo_senado <-
-  function(data_inicial = "20200311",
-           data_final = gsub("-", "", Sys.Date())) {
+  function(data_inicial = "2020-03-11",
+           data_final = Sys.Date()) {
     library(tidyverse)
     
     url <-
       paste0(
         "http://legis.senado.leg.br/dadosabertos/materia/pesquisa/lista?dataInicioApresentacao=",
-        data_inicial,
+        gsub("-", "", data_inicial),
         "&dataFimApresentacao=",
-        data_final
+        gsub("-", "", data_final)
       )
     
     proposicoes <- tryCatch({
