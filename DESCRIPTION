@@ -36,7 +36,8 @@ Imports: here,
     pdftools,
     eeptools,
     rcongresso,
-    agoradigital
+    agoradigital,
+    stringr
 Suggests: testthat,
     knitr,
     vistime,

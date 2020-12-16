@@ -34,7 +34,7 @@ fetch_proposicoes_tramitadas_camara <- function(data_inicio = "2019-02-01", data
   ultima_pagina <- links %>% 
     filter(rel == "last") %>% 
     pull(href) %>% 
-    str_match("pagina=(.*?)&") %>% 
+    stringr::str_match("pagina=(.*?)&") %>% 
     tibble::as_tibble(.name_repair = c("universal")) %>% 
     pull(`...2`)
   
