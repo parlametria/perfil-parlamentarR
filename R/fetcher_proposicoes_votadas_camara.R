@@ -11,31 +11,40 @@ fetch_proposicoes_votadas_camara <- function(ano = 2019) {
   library(xml2)
   library(jsonlite)
   
-  url_votacoes <- "https://www.camara.leg.br/SitCamaraWS/Proposicoes.asmx/ListarProposicoesVotadasEmPlenario?ano=%s&tipo="
+  url_votacoes <- "https://dadosabertos.camara.leg.br/arquivos/votacoes/csv/votacoes-%s.csv"
   
   url <- url_votacoes %>% 
     sprintf(ano)
   
   proposicoes <- tryCatch({
-    xml <- getURL(url) %>% read_xml()
     
-    data <- xml_find_all(xml, ".//proposicao") %>%
-      map_df(function(x) {
-        list(
-          id = xml_find_first(x, ".//codProposicao") %>% 
-            xml_text(),
-          nome_proposicao = xml_find_first(x, ".//nomeProposicao") %>% 
-            xml_text(),
-          data_votacao = xml_find_first(x, ".//dataVotacao") %>% 
-            xml_text()
-        )
-      }) %>%
-      select(id, nome_proposicao, data_votacao)
+   data <- read_delim(url, delim = ";") %>% 
+     rowwise(.) %>% 
+     mutate(proposicao_id = stringr::str_split(id, "-")[[1]][1]) %>% 
+     ungroup()
+   
+   proposicoes <- data %>% 
+     group_by(proposicao_id) %>% 
+     mutate(lastest_data = max(data)) %>% 
+     select(id = proposicao_id, data_votacao = lastest_data) %>% 
+     distinct()
+   
+   return(proposicoes)
+   
+   # proposicoes_sigla <-
+   #   purrr::map_df(proposicoes$proposicao_id, ~rcongresso::fetch_proposicao_camara(.x)) %>% 
+   #   mutate(sigla = stringr::str_glue("{siglaTipo} {numero}/{ano}"),
+   #          id = as.character(id)) %>% 
+   #   select(id, sigla)
+   # 
+   # proposicoes_votadas <- data %>% 
+   #   select(proposicao_id, data) %>% 
+   #   inner_join(proposicoes_sigla, by = c("proposicao_id"="id"))
   
   }, error = function(e) {
     message(e)
     data <- tribble(
-      ~ id, ~ nome_proposicao, ~ data_votacao)
+      ~ id, ~ data_votacao)
     return(data)
   })
   
