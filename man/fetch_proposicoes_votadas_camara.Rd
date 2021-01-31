@@ -10,7 +10,7 @@ fetch_proposicoes_votadas_camara(ano = 2019)
 \item{ano}{Ano de ocorrência das votações}
 }
 \value{
-Dataframe contendo id da proposição, nome e data da votação
+Dataframe contendo id da proposição e data da última votação
 }
 \description{
 Lista as proposições votadas em plenário para um determinado ano

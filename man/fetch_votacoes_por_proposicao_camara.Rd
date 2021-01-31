@@ -2,21 +2,20 @@
 % Please edit documentation in R/fetcher_proposicoes_votadas_camara.R
 \name{fetch_votacoes_por_proposicao_camara}
 \alias{fetch_votacoes_por_proposicao_camara}
-\title{Recupera informações de votações a partir de um xml}
+\title{Recupera informações de votações em plenário a partir de um id de proposição}
 \usage{
-fetch_votacoes_por_proposicao_camara(id_proposicao, xml = NULL)
+fetch_votacoes_por_proposicao_camara(id_proposicao)
 }
 \arguments{
 \item{id_proposicao}{ID da proposição}
-
-\item{xml}{xml com votações. Se Null então o xml é carregado}
 }
 \value{
 Info sobre as votações
 }
 \description{
-A partir do xml das votações recupera dados de todas as votações disponíveis
+A partir do id de uma proposição,
+recupera dados de todas as votações disponíveis
 }
 \examples{
-votacoes_mpv8712019 <- fetch_votacoes_por_proposicao_camara(2190355, xml)
+votacoes_mpv8712019 <- fetch_votacoes_por_proposicao_camara(2190355)
 }
