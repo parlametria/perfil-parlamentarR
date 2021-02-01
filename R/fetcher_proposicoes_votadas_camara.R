@@ -77,10 +77,10 @@ fetch_votacoes_por_proposicao_camara <- function(id_proposicao) {
       mutate(data = gsub("T", " ", dataHoraRegistro)) %>% 
       ungroup() %>% 
       select(id_votacao = id,
-             obj_votacao = descricao,
+             resumo = descricao,
              data)
   }, error = function(e) {
-    data <- tribble(~ id_votacao, ~ obj_votacao, ~ data)
+    data <- tribble(~ id_votacao, ~ resumo, ~ data)
     return(data)
   })
 
