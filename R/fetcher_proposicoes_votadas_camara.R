@@ -58,7 +58,7 @@ fetch_proposicoes_votadas_camara <- function(ano = 2019) {
 #' @param id_proposicao ID da proposição
 #' @return Info sobre as votações
 #' @examples
-#' votacoes_mpv8712019 <- fetch_votacoes_por_proposicao_camara(2190355)
+#' votacoes_2190237 <- fetch_votacoes_por_proposicao_camara(2190237)
 #' @export
 fetch_votacoes_por_proposicao_camara <- function(id_proposicao) {
   library(tidyverse)
@@ -73,14 +73,15 @@ fetch_votacoes_por_proposicao_camara <- function(id_proposicao) {
     
     data <- data %>% 
       filter(siglaOrgao == 'PLEN') %>% 
-      rowwise(.) %>% 
-      mutate(data = gsub("T", " ", dataHoraRegistro)) %>% 
-      ungroup() %>% 
-      select(id_votacao = id,
-             resumo = descricao,
-             data)
+      distinct(id) %>% 
+      mutate(dados = map(id,
+                         fetch_votacao)) %>% 
+      unnest(dados) %>% 
+      select(-id) %>% 
+      mutate(id_proposicao = id_proposicao)
+    
   }, error = function(e) {
-    data <- tribble(~ id_votacao, ~ resumo, ~ data)
+    data <- tribble(~ id_votacao, ~ data, ~sigla_orgao, ~ obj_votacao, ~resumo, ~id_proposicaao)
     return(data)
   })
 

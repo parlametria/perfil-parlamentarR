@@ -9,6 +9,8 @@
 fetch_votacao <- function(id_votacao) {
   library(tidyverse)
   
+  print(paste0("Baixando dados da votação ", id_votacao))
+  
   url_votacoes <- "https://dadosabertos.camara.leg.br/api/v2/votacoes/%s"
   
   url <- url_votacoes %>% 
@@ -21,19 +23,21 @@ fetch_votacao <- function(id_votacao) {
       tribble(
         ~ id_votacao,
         ~ data,
-        ~ sigla_orgao,
         ~ obj_votacao,
         ~ resumo,
         data$id,
         data$dataHoraRegistro,
-        data$siglaOrgao,
         data$descUltimaAberturaVotacao,
         data$descricao
       )
+    
+    votacao <- votacao %>% 
+      mutate(obj_votacao = if_else(obj_votacao == "NULL", "", as.character(obj_votacao)))
+    
     return(votacao)
     
   }, error = function(e) {
-    data <- tribble(~ id_votacao, ~ data, ~sigla_orgao, ~ obj_votacao, ~resumo)
+    data <- tribble(~ id_votacao, ~ data, ~ obj_votacao, ~resumo)
     return(data)
   })
   

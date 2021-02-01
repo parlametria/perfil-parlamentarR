@@ -17,5 +17,5 @@ A partir do id de uma proposição,
 recupera dados de todas as votações disponíveis
 }
 \examples{
-votacoes_mpv8712019 <- fetch_votacoes_por_proposicao_camara(2190355)
+votacoes_2190237 <- fetch_votacoes_por_proposicao_camara(2190237)
 }
