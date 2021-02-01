@@ -69,9 +69,10 @@ fetch_votacoes_por_proposicao_camara <- function(id_proposicao) {
     sprintf(id_proposicao)
   
   votacoes <- tryCatch({
-    data <- (RCurl::getURI(url) %>% fromJSON())$dados
+    data <- (RCurl::getURI(url) %>% jsonlite::fromJSON())$dados
     
     data <- data %>% 
+      filter(siglaOrgao == 'PLEN') %>% 
       rowwise(.) %>% 
       mutate(data = gsub("T", " ", dataHoraRegistro)) %>% 
       ungroup() %>% 
