@@ -3,7 +3,7 @@
 #' recupera seus dados disponíveis
 #' @param id_votacao ID da votação
 #' @return Info sobre uma votação
-#' @example 
+#' @examples
 #' votacao_2190237_117 <- fetch_votacao("2190237-117")
 #' @export
 fetch_votacao <- function(id_votacao) {
@@ -22,10 +22,12 @@ fetch_votacao <- function(id_votacao) {
     votacao <-
       tribble(
         ~ id_votacao,
+        ~ id_proposicao,
         ~ data,
         ~ obj_votacao,
         ~ resumo,
         data$id,
+        data$proposicoesAfetadas$id,
         data$dataHoraRegistro,
         data$descUltimaAberturaVotacao,
         data$descricao
@@ -37,7 +39,7 @@ fetch_votacao <- function(id_votacao) {
     return(votacao)
     
   }, error = function(e) {
-    data <- tribble(~ id_votacao, ~ data, ~ obj_votacao, ~resumo)
+    data <- tribble(~ id_votacao, ~id_proposicao, ~ data, ~ obj_votacao, ~resumo)
     return(data)
   })
   

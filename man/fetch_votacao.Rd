@@ -16,3 +16,6 @@ Info sobre uma votação
 A partir do id de uma votação,
 recupera seus dados disponíveis
 }
+\examples{
+votacao_2190237_117 <- fetch_votacao("2190237-117")
+}
