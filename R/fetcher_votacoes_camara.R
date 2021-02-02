@@ -34,7 +34,8 @@ fetch_votacao <- function(id_votacao) {
       )
     
     votacao <- votacao %>% 
-      mutate(obj_votacao = if_else(obj_votacao == "NULL", "", as.character(obj_votacao)))
+      mutate(obj_votacao = as.character(replace_empty_list_for_na(obj_votacao)),
+             id_proposicao = as.numeric(replace_empty_list_for_na(id_proposicao)))
     
     return(votacao)
     

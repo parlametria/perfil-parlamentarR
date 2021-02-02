@@ -155,3 +155,16 @@ get_sigla_by_id_camara <- function(id_proposicao) {
   
   return(atributos)
 }
+
+#' @title Retorna um NA caso o campo seja uma lista nula
+#' @description Recebe um valor e retorna NA se for uma lista nula ou
+#' o próprio valor, caso contrário.
+#' @param valor valor a ser checado
+#' @export
+replace_empty_list_for_na <- function(valor) {
+  if (is.list(valor)) {
+    return(NA)
+  }
+  
+  return(valor)
+}
