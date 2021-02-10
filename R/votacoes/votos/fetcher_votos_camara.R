@@ -7,9 +7,8 @@
 fetch_votos_por_votacao_camara <- function(id_votacao) {
   library(tidyverse)
   library(RCurl)
-  library(stringr)
   library(jsonlite)
-  source("workspace/perfil-parlamentarR/R/fetcher_votacoes_camara.R")
+  source(here::here("workspace/perfil-parlamentarR/R/fetcher_votacoes_camara.R"))
   
   url <-  stringr::str_interp("https://dadosabertos.camara.leg.br/api/v2/votacoes/${id_votacao}/votos")
   
@@ -38,16 +37,43 @@ fetch_votos_por_votacao_camara <- function(id_votacao) {
 }
 
 
+#' @title Recupera votos de um xml de votações a partir do código da sessão e da hora
+#' @description Votos dos deputados a partir do código da sessão e da hora
+#' @param cod_sessao Código da sessão da votação
+#' @param hora Hora da sessão da votação
+#' @param xml xml com votações
+#' @return Votos dos parlamentares na votação específica
+#' @examples
+#' votos <- fetch_votos_por_sessao_camara("16821", "19:57", xml)
+fetch_votos_por_sessao_camara <- function(cod_sessao, hora, xml) {
+  library(tidyverse)
+  library(xml2)
+  
+  votos <- xml_find_all(xml, paste0(".//Votacao[@codSessao = '",
+                                    cod_sessao,"' and @Hora = '", hora,"']",
+                                    "//votos//Deputado")) %>%
+    map_df(function(x) {
+      list(
+        id_deputado = xml_attr(x, "ideCadastro"),
+        voto = xml_attr(x, "Voto") %>%
+          gsub(" ", "", .),
+        partido = xml_attr(x, "Partido"))
+    }) %>%
+    select(id_deputado,
+           voto,
+           partido)
+}
+
+
 #' @title Recupera informações de votos de todas as votações de uma determinada proposição para um determinado ano
 #' @description A partir do id da proposição e do ano recupera votos que aconteceram na Câmara dos Deputados
-#' @param id_proposicao ID da proposição
+#' @param id_votacao ID da votacao
 #' @param ano Ano para o período de votações
 #' @return Votos dos parlametares para a proposição (inclui várias votações)
 #' @examples
 #' votos <- fetch_votos_por_ano_camara(2190355, 2019)
-fetch_votos_por_ano_camara <- function(id_votacao, ano = 2019) {
+fetch_votos_por_ano_camara <- function(id_votacao, ano ) {
   library(tidyverse)
-  library(dplyr)
   library(lubridate)
   
   votacoes_filtradas <- fetch_votos_por_votacao_camara(id_votacao)
@@ -70,11 +96,10 @@ fetch_votos_por_ano_camara <- function(id_votacao, ano = 2019) {
     ungroup()
   
   votos <- votos_raw %>%
-    mutate(partido = padroniza_sigla(deputado_.siglaPartido)) %>%
+    mutate(partido = padroniza_sigla(partido)) %>%
     enumera_voto() %>%
-    select(id_votacao, deputado_.id, tipoVoto, deputado_.siglaPartido) %>%
+    select(id_votacao, id_deputado, voto, partido) %>%
     distinct()  
   
   return(votos)
-}
 }
