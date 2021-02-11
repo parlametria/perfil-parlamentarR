@@ -4,11 +4,11 @@
 #' @return Dataframe contendo id da votação, id e voto e partido dos deputados que participaram de cada votação
 #' @examples id_votacao = "2265603-43"
 #' votacoes <- fetch_votos_por_votacao_camara(2165578, 8334)
+#' @export
 fetch_votos_por_votacao_camara <- function(id_votacao) {
   library(tidyverse)
   library(RCurl)
   library(jsonlite)
-  source(here::here("workspace/perfil-parlamentarR/R/fetcher_votacoes_camara.R"))
   
   url <-  stringr::str_interp("https://dadosabertos.camara.leg.br/api/v2/votacoes/${id_votacao}/votos")
   
@@ -16,54 +16,23 @@ fetch_votos_por_votacao_camara <- function(id_votacao) {
       
   votos <- (RCurl::getURL(url) %>% 
                   jsonlite::fromJSON(flatten = TRUE))$dados
-      
+  
+  if(is.list(votos) && length(votos) == 0) {
+    return(tibble())
+  }
+
   votos <- votos %>% mutate(id_votacao = id_votacao)
       
-  votacoes <- fetch_votacao(id_votacao)
-      
-  votos_alt <- inner_join(votacoes, votos, by = c("id_votacao")) %>% 
-      select(id_votacao,
-              id_proposicao, 
-              data, 
-              resumo, 
-              tipoVoto,
-              deputado_.id, 
-              deputado_.siglaPartido) %>% 
-      rename(voto = tipoVoto, 
-             id_deputado = deputado_.id,
-             partido = deputado_.siglaPartido)
+  votos_alt <- votos %>% 
+      select(
+        id_votacao,
+        voto = tipoVoto, 
+        id_deputado = deputado_.id,
+        partido = deputado_.siglaPartido
+        )
       
       return(votos_alt)
 }
-
-
-#' @title Recupera votos de um xml de votações a partir do código da sessão e da hora
-#' @description Votos dos deputados a partir do código da sessão e da hora
-#' @param cod_sessao Código da sessão da votação
-#' @param hora Hora da sessão da votação
-#' @param xml xml com votações
-#' @return Votos dos parlamentares na votação específica
-#' @examples
-#' votos <- fetch_votos_por_sessao_camara("16821", "19:57", xml)
-fetch_votos_por_sessao_camara <- function(cod_sessao, hora, xml) {
-  library(tidyverse)
-  library(xml2)
-  
-  votos <- xml_find_all(xml, paste0(".//Votacao[@codSessao = '",
-                                    cod_sessao,"' and @Hora = '", hora,"']",
-                                    "//votos//Deputado")) %>%
-    map_df(function(x) {
-      list(
-        id_deputado = xml_attr(x, "ideCadastro"),
-        voto = xml_attr(x, "Voto") %>%
-          gsub(" ", "", .),
-        partido = xml_attr(x, "Partido"))
-    }) %>%
-    select(id_deputado,
-           voto,
-           partido)
-}
-
 
 #' @title Recupera informações de votos de todas as votações de uma determinada proposição para um determinado ano
 #' @description A partir do id da proposição e do ano recupera votos que aconteceram na Câmara dos Deputados
@@ -71,12 +40,13 @@ fetch_votos_por_sessao_camara <- function(cod_sessao, hora, xml) {
 #' @param ano Ano para o período de votações
 #' @return Votos dos parlametares para a proposição (inclui várias votações)
 #' @examples
-#' votos <- fetch_votos_por_ano_camara(2190355, 2019)
-fetch_votos_por_ano_camara <- function(id_votacao, ano ) {
+#' votos <- fetch_votos_por_ano_camara(2190237, 2019)
+#' @export
+fetch_votos_por_ano_camara <- function(id_proposicao, ano) {
   library(tidyverse)
   library(lubridate)
   
-  votacoes_filtradas <- fetch_votos_por_votacao_camara(id_votacao)
+  votacoes_filtradas <-fetch_votacoes_por_proposicao_camara(id_proposicao)
   
   votacoes_filtradas$data <-  ymd_hms(votacoes_filtradas$data)
   votacoes_filtradas$data_ano <- year(votacoes_filtradas$data) 

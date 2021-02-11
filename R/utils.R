@@ -168,3 +168,25 @@ replace_empty_list_for_na <- function(valor) {
   
   return(valor)
 }
+
+#' @title Enumera votações
+#' @description Recebe um dataframe com coluna voto e enumera o valor para um número
+#' @param df Dataframe com a coluna voto
+#' @return Dataframe com coluna voto enumerada
+#' @examples
+#' enumera_votacoes(df)
+enumera_voto <- function(df) {
+  df %>%
+    mutate(
+      voto = case_when(
+        str_detect(voto, "Não") ~ -1,
+        str_detect(voto, "Sim") ~ 1,
+        str_detect(voto, "Obstrução|P-OD") ~ 2,
+        str_detect(voto, "Abstenção") ~ 3,
+        str_detect(voto, "Art. 17|art. 51 RISF") ~ 4,
+        str_detect(voto, "Liberado") ~ 5,
+        #TODO: Tratar caso P-NRV: Presente mas não registrou foto
+        TRUE ~ 0
+      )
+    )
+}
