@@ -57,7 +57,8 @@ delete_file <- function(filepath) {
 #' @param id_proposicao id da proposicao requerida
 #' @param id_votacao id da votacao requerida
 #' @return Dataframe com informações de votos dos senadores
-fetch_votos_por_link_votacao_senado <- function(id_proposicao, id_votacao) {
+#' @export
+fetch_votos_por_proposicao_votacao_senado <- function(id_proposicao, id_votacao) {
   library(RCurl)
   library(rvest)
   library(xml2)
@@ -68,7 +69,7 @@ fetch_votos_por_link_votacao_senado <- function(id_proposicao, id_votacao) {
   
   print(paste0("Extraindo informações de votação de id ", id_votacao))
   
-  pdf_filepath <- here::here("crawler/votacoes/votos/votacao_senado.pdf")
+  pdf_filepath <- "votacao_senado.pdf"
   
   download_pdf(url, pdf_filepath)
   
@@ -84,34 +85,22 @@ fetch_votos_por_link_votacao_senado <- function(id_proposicao, id_votacao) {
 #' @description A partir de um dataframe de votações, extrai os dados de votos dos senadores.
 #' @param votacoes_senado_filepath Caminho para o csv das votações
 #' @return Dataframe com informações de votos dos senadores
-#' @example 
-#' source(here::here("crawler/proposicoes/utils_proposicoes.R"))
-#' votos <- fetch_all_votos_senado(.URL_PROPOSICOES_PLENARIO_SENADO)
-fetch_all_votos_senado <- function(url_proposicoes = NULL) {
+#' @examples 
+#' votos <- fetch_votos_por_proposicao_senado(136635)
+#' @export
+fetch_votos_por_proposicao_senado <- function(id_proposicao) {
   library(tidyverse)
   
-  if (is.null(url_proposicoes)) {
-    votacoes <- fetch_proposicoes_votadas_senado()
-  } else {
-    source(here::here("crawler/proposicoes/fetcher_proposicoes_senado.R"))
-    proposicoes_selecionadas <- fetch_proposicoes_plenario_selecionadas_senado() %>% 
-      pull(id_proposicao)
-    votacoes <- fetch_proposicoes_votadas_senado() %>% 
-      filter(id_proposicao %in% proposicoes_selecionadas)
-  }
-  
-  votacoes <- votacoes %>% 
-    filter(votacao_secreta == 0) %>% 
-    mutate(ano = lubridate::year(datetime))
+  votacoes <- 
+    fetcher_votacoes_por_proposicao_senado(id_proposicao)
   
   votos <- 
     tibble::tibble(
       id_proposicao = votacoes$id_proposicao,
-      id_votacao = votacoes$id_votacao,
-      ano = votacoes$ano,
-      url = votacoes$link_votacao,
+      id_votacao = votacoes$codigo_sessao,
+      data = votacoes$datetime,
       casa = "senado") %>% 
-    mutate(dados = purrr::map2(id_proposicao, id_votacao, fetch_votos_por_link_votacao_senado)) %>% 
+    mutate(dados = purrr::map2(id_proposicao, id_votacao, fetch_votos_por_proposicao_votacao_senado)) %>% 
     unnest(dados) %>% 
     filter(senador != '')
   
