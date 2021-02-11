@@ -2,7 +2,7 @@
 #' @description A partir de uma url e de o caminho de destino + nome para o pdf, baixa e salva este arquivo
 #' @param url URL da requisição
 #' @param dest_path Caminho + nome do arquivo PDF que será baixado.
-download_pdf <- function(url, dest_path = "votacao_senado.pdf") {
+.download_pdf <- function(url, dest_path = "votacao_senado.pdf") {
   download.file(url, dest_path, mode="wb")
 }
 
@@ -11,7 +11,7 @@ download_pdf <- function(url, dest_path = "votacao_senado.pdf") {
 #' @param url URL da requisição
 #' @param dest_path Caminho + nome do arquivo PDF que será baixado.
 #' @return Dataframe com informações de votos dos senadores
-scrap_votos_from_pdf_senado <- function(pdf_filepath) {
+.scrap_votos_from_pdf_senado <- function(pdf_filepath) {
   library(tidyverse)
   
   pdf <- pdftools::pdf_text(pdf_filepath)
@@ -48,7 +48,7 @@ scrap_votos_from_pdf_senado <- function(pdf_filepath) {
 #' @title Deleta um arquivo
 #' @description A partir do caminho de um arquivo, deleta-o do computador.
 #' @param filepath Caminho do arquivo a ser removido.
-delete_file <- function(filepath) {
+.delete_file <- function(filepath) {
   file.remove(filepath)
 }
 
@@ -71,11 +71,11 @@ fetch_votos_por_proposicao_votacao_senado <- function(id_proposicao, id_votacao)
   
   pdf_filepath <- "votacao_senado.pdf"
   
-  download_pdf(url, pdf_filepath)
+  .download_pdf(url, pdf_filepath)
   
-  votos <- scrap_votos_from_pdf_senado(pdf_filepath)
+  votos <- .scrap_votos_from_pdf_senado(pdf_filepath)
   
-  delete_file(pdf_filepath)
+  .delete_file(pdf_filepath)
   
   
   return(votos)
