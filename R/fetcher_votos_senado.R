@@ -102,6 +102,7 @@ fetch_votos_por_proposicao_senado <- function(id_proposicao) {
       casa = "senado") %>% 
     mutate(dados = purrr::map2(id_proposicao, id_votacao, fetch_votos_por_proposicao_votacao_senado)) %>% 
     unnest(dados) %>% 
+    enumera_voto() %>% 
     filter(senador != '')
   
   return(votos)
