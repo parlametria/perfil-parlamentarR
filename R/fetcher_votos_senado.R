@@ -77,6 +77,13 @@ fetch_votos_por_proposicao_votacao_senado <- function(id_proposicao, id_votacao)
   
   .delete_file(pdf_filepath)
   
+  votos <- votos %>% 
+    mutate(id_votacao = id_votacao,
+           id_proposicao = id_proposicao) %>% 
+    enumera_voto() %>% 
+    filter(senador != '') %>% 
+    select(id_proposicao, id_votacao, senador, uf, partido, voto)
+  
   
   return(votos)
 } 
