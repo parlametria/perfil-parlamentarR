@@ -190,3 +190,23 @@ enumera_voto <- function(df) {
       )
     )
 }
+
+
+#' @title Mapeia um nome eleitoral para id correspondente
+#' @description Recebe dois dataframes contendo nome eleitoral e um deles com informação de id
+#' @param senadores_df Dataframe com as informações de nome_eleitoral e id
+#' @param target_df Dataframe a receber o id do parlamentar
+#' @return Dataframe target_df contendo coluna id
+#' @export
+mapeia_nome_eleitoral_to_id_senado <- function(senadores_df, target_df) {
+  library(tidyverse)
+  
+  result <- 
+    target_df %>% 
+    left_join(
+      senadores_df %>%
+        select(nome_eleitoral, id), 
+      by=c("nome_eleitoral"))
+  
+  return(result)
+}

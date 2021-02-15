@@ -26,9 +26,8 @@ fetch_votos_por_votacao_camara <- function(id_votacao) {
   votos_alt <- votos %>% 
       select(
         id_votacao,
-        voto = tipoVoto, 
-        id_deputado = deputado_.id,
-        partido = deputado_.siglaPartido
+        id_parlamentar = deputado_.id,
+        voto = tipoVoto
         )
       
       return(votos_alt)
@@ -66,9 +65,8 @@ fetch_votos_por_ano_camara <- function(id_proposicao, ano) {
     ungroup()
   
   votos <- votos_raw %>%
-    mutate(partido = padroniza_sigla(partido)) %>%
     enumera_voto() %>%
-    select(id_votacao, id_deputado, voto, partido) %>%
+    select(id_votacao, id_parlamentar, voto) %>%
     distinct()  
   
   return(votos)
