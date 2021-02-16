@@ -13,6 +13,7 @@
 #' @return Dataframe com informações de votos dos senadores
 .scrap_votos_from_pdf_senado <- function(pdf_filepath) {
   library(tidyverse)
+  library(stringr)
   
   pdf <- pdftools::pdf_text(pdf_filepath)
   
@@ -109,7 +110,6 @@ fetch_votos_por_proposicao_senado <- function(id_proposicao) {
     mutate(dados = purrr::map2(id_proposicao, id_votacao, fetch_votos_por_proposicao_votacao_senado)) %>% 
     select(-c(id_proposicao, id_votacao)) %>% 
     unnest(dados) %>% 
-    enumera_voto() %>% 
     filter(senador != '')
   
   return(votos)
