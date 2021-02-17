@@ -81,8 +81,20 @@ fetch_votos_por_proposicao_votacao_senado <- function(id_proposicao, id_votacao)
     mutate(id_votacao = id_votacao,
            id_proposicao = id_proposicao) %>% 
     filter(senador != '') %>% 
-    select(id_proposicao, id_votacao, senador, uf, partido, voto)
+    select(id_proposicao, id_votacao, senador, uf, partido, voto) %>% 
+    mutate(id_proposicao = as.character(id_proposicao),
+           id_votacao = as.character(id_votacao))
   
+  if (nrow(votos) == 0) {
+    return(tibble(
+      id_proposicao = character(),
+      id_votacao = character(),
+      senador = character(),
+      uf = character(),
+      partido = character(),
+      voto = character()
+    ))  
+  }
   
   return(votos)
 } 

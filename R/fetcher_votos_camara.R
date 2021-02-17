@@ -45,15 +45,15 @@ fetch_votos_por_ano_camara <- function(id_proposicao, ano) {
   library(tidyverse)
   library(lubridate)
   
-  votacoes_filtradas <-fetch_votacoes_por_proposicao_camara(id_proposicao)
+  votacoes_filtradas <- fetch_votacoes_por_proposicao_camara(id_proposicao)
   
-  votacoes_filtradas$data <-  ymd_hms(votacoes_filtradas$data)
+  votacoes_filtradas$data <- ymd_hms(votacoes_filtradas$data)
   votacoes_filtradas$data_ano <- year(votacoes_filtradas$data) 
   
   votacoes_filtradas <- filter(votacoes_filtradas, data_ano == ano) %>% select(-data_ano)
   
   votacoes_filtradas <- votacoes_filtradas %>%
-    distinct(id_votacao, .keep=T)
+    distinct(id_votacao, .keep_all = T)
   
   votos_raw <- tibble(id_votacao = votacoes_filtradas$id_votacao) %>%
     rowwise(.) %>% 
@@ -64,10 +64,18 @@ fetch_votos_por_ano_camara <- function(id_proposicao, ano) {
     unnest(dados)  %>%
     ungroup()
   
-  votos <- votos_raw %>%
-    enumera_voto() %>%
-    select(id_votacao, id_parlamentar, voto) %>%
-    distinct()  
+  votos <- tryCatch({
+    votos_raw %>%
+      enumera_voto() %>%
+      select(id_votacao, id_parlamentar, voto) %>%
+      distinct()
+  }, error = function(e) {
+    print(e)
+    print(paste0("Proposição: ", id_proposicao, ". Votos recuperados: ", nrow(votos_raw)))
+    return(tibble::tibble(id_votacao = character(),
+                          id_parlamentar = integer(),
+                          voto = numeric()))
+  })
   
   return(votos)
 }
