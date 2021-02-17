@@ -13,7 +13,7 @@ library(tidyverse)
 #' votos_com_id_senador <- process_votos_senado(votos, senadores_df)
 #' @return Datafrane com os votos.
 #' @export
-process_votos_senado <- function(votos, senadores_df) {
+processa_votos_senado <- function(votos, senadores_df) {
   
   votos <- votos %>%
     select(id_proposicao, id_votacao, nome_eleitoral = senador, partido, voto)

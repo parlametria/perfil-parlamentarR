@@ -119,7 +119,7 @@ get_voto_lider <- function(lideres, votos, id_votacao) {
   if (length(voto) == 0) {
     return(as.numeric(NA))
   } else{
-    return(voto)
+    return(as.numeric(voto))
   }
 }
 
@@ -157,8 +157,8 @@ calcula_voto_maioria_absoluta <- function(votos, sigla_partido) {
     orientacoes <- orientacoes %>%
       mutate(voto = if_else(
         empate == 1,
-        as.character(get_voto_lider(lideres, votos, id_votacao)),
-        voto
+        get_voto_lider(lideres, votos, id_votacao),
+        as.numeric(voto)
       )) %>%
       unique()
   }
