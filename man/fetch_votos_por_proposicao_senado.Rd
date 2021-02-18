@@ -4,9 +4,11 @@
 \alias{fetch_votos_por_proposicao_senado}
 \title{Extrai informações de votos dos senadores a partir de um conjutno de votações}
 \usage{
-fetch_votos_por_proposicao_senado(id_proposicao)
+fetch_votos_por_proposicao_senado(id_proposicao, enumera_votos = TRUE)
 }
 \arguments{
+\item{enumera_votos}{Flag para enumerar ou não os votos}
+
 \item{votacoes_senado_filepath}{Caminho para o csv das votações}
 }
 \value{

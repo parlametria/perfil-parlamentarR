@@ -13,6 +13,7 @@
 #' @return Dataframe com informações de votos dos senadores
 .scrap_votos_from_pdf_senado <- function(pdf_filepath) {
   library(tidyverse)
+  library(stringr)
   
   pdf <- pdftools::pdf_text(pdf_filepath)
   
@@ -102,11 +103,12 @@ fetch_votos_por_proposicao_votacao_senado <- function(id_proposicao, id_votacao)
 #' @title Extrai informações de votos dos senadores a partir de um conjutno de votações
 #' @description A partir de um dataframe de votações, extrai os dados de votos dos senadores.
 #' @param votacoes_senado_filepath Caminho para o csv das votações
+#' @param enumera_votos Flag para enumerar ou não os votos
 #' @return Dataframe com informações de votos dos senadores
 #' @examples 
 #' votos <- fetch_votos_por_proposicao_senado(136635)
 #' @export
-fetch_votos_por_proposicao_senado <- function(id_proposicao) {
+fetch_votos_por_proposicao_senado <- function(id_proposicao, enumera_votos=TRUE) {
   library(tidyverse)
   
   votacoes <- 
@@ -121,8 +123,12 @@ fetch_votos_por_proposicao_senado <- function(id_proposicao) {
     mutate(dados = purrr::map2(id_proposicao, id_votacao, fetch_votos_por_proposicao_votacao_senado)) %>% 
     select(-c(id_proposicao, id_votacao)) %>% 
     unnest(dados) %>% 
-    enumera_voto() %>% 
     filter(senador != '')
+  
+  if (enumera_votos) {
+    votos <- votos %>% 
+      enumera_voto()
+  }
   
   return(votos)
   
