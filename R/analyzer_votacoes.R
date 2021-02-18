@@ -41,9 +41,9 @@ processa_votacoes_camara_anos <- function(anos = c(2019, 2020)) {
 #' @param anos Lista de anos para recuperação das votações
 #' @return Dataframe votações
 #' @examples
-#' processa_votos_senado_anos(anos = c(2020))
+#' processa_votacoes_senado_anos(anos = c(2020))
 #' @export
-processa_votos_senado_anos <- function(anos = c(2019, 2020)) {
+processa_votacoes_senado_anos <- function(anos = c(2019, 2020)) {
   library(lubridate)
   
   data_inicial <- paste0("01/01/", anos[1])
