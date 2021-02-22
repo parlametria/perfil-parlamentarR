@@ -3,7 +3,7 @@
 #' @param id_votacao Id da votação no contexto interno do Voz Ativa
 #' @return Dataframe contendo id da votação, id e voto e partido dos deputados que participaram de cada votação
 #' @examples id_votacao = "2265603-43"
-#' votacoes <- fetch_votos_por_votacao_camara(2165578, 8334)
+#' votacoes <- fetch_votos_por_votacao_camara("2179189-88")
 #' @export
 fetch_votos_por_votacao_camara <- function(id_votacao) {
   library(tidyverse)
@@ -27,10 +27,11 @@ fetch_votos_por_votacao_camara <- function(id_votacao) {
       select(
         id_votacao,
         id_parlamentar = deputado_.id,
+        partido = deputado_.siglaPartido,
         voto = tipoVoto
         )
       
-      return(votos_alt)
+  return(votos_alt)
 }
 
 #' @title Recupera informações de votos de todas as votações de uma determinada proposição para um determinado ano
@@ -67,13 +68,14 @@ fetch_votos_por_ano_camara <- function(id_proposicao, ano) {
   votos <- tryCatch({
     votos_raw %>%
       enumera_voto() %>%
-      select(id_votacao, id_parlamentar, voto) %>%
+      select(id_votacao, id_parlamentar, partido, voto) %>%
       distinct()
   }, error = function(e) {
     print(e)
     print(paste0("Proposição: ", id_proposicao, ". Votos recuperados: ", nrow(votos_raw)))
     return(tibble::tibble(id_votacao = character(),
                           id_parlamentar = integer(),
+                          partido = character(),
                           voto = numeric()))
   })
   

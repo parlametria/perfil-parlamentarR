@@ -17,5 +17,5 @@ Recebe informações da votação específica para obtenção dos votos
 }
 \examples{
 id_votacao = "2265603-43"
-votacoes <- fetch_votos_por_votacao_camara(2165578, 8334)
+votacoes <- fetch_votos_por_votacao_camara("2179189-88")
 }

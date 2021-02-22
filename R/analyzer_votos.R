@@ -61,7 +61,7 @@ processa_votos_camara_anos <- function(anos = c(2019, 2020)) {
   
   votos_alt <- votos %>% 
     mutate(id_proposicao = gsub("-.*$", "", id_votacao)) %>% 
-    select(id_proposicao, id_votacao, id_parlamentar, voto)
+    select(id_proposicao, id_votacao, id_parlamentar, partido, voto)
   
   return(votos_alt)
 }
@@ -102,7 +102,7 @@ processa_votos_senado_anos <- function(anos = c(2019, 2020)) {
     mutate(senador = padroniza_texto(senador) %>% trimws(which = "both")) %>% 
     left_join(senadores,
               by = c("senador" = "nome_eleitoral", "uf" = "uf")) %>% 
-    select(id_proposicao, id_votacao, id_parlamentar, voto)
+    select(id_proposicao, id_votacao, id_parlamentar, partido, voto)
   
   return(votos_alt)
 }
