@@ -26,10 +26,16 @@ processa_votacoes_camara_anos <- function(anos = c(2019, 2020)) {
       function(x, y) {
         votacoes <- fetch_votacoes_por_proposicao_camara(x)
         
-        votacoes <- votacoes %>% 
-          mutate(ano = year(ymd(strsplit(data, "T")[[1]][1]))) %>% 
-          filter(ano == y) %>% 
-          select(-ano)
+        votacoes <- tryCatch({
+          data <- votacoes %>% 
+            mutate(ano = year(ymd(strsplit(data, "T")[[1]][1]))) %>% 
+            filter(ano == y) %>% 
+            select(-ano)
+          return(data)
+        }, error = function(e) {
+          print(paste0("Não foi possível filtrar votações que ocorreram em ", y, ". Retornando todas da proposição."))
+          return(votacoes)
+        })
       }
     )
   
@@ -53,7 +59,7 @@ processa_votacoes_senado_anos <- function(anos = c(2019, 2020)) {
     perfilparlamentar::fetch_proposicoes_votadas_senado(data_inicial, data_final) %>% 
     filter(votacao_secreta == 0) 
   
-  if (nrow(proposicoes_votadas) == 0){
+  if (nrow(proposicoes_votadas) == 0) {
     return(tibble(id_proposicao = character(),
                   objeto_votacao = character(),
                   datetime = character(),
