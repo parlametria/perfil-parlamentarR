@@ -8,8 +8,6 @@ library(tidyverse)
 #' votacoes <- fetch_orientacoes_votacao_camara("2265603-43")
 #' @export
 fetch_orientacoes_votacao_camara <-function(id_votacao) {
-    source(here("R/votacoes/utils_votacoes.R"))
-    
     url <-
       paste0(
         "https://dadosabertos.camara.leg.br/api/v2/votacoes/",
