@@ -52,8 +52,8 @@ processa_votacoes_camara_anos <- function(anos = c(2019, 2020)) {
 processa_votacoes_senado_anos <- function(anos = c(2019, 2020)) {
   library(lubridate)
   
-  data_inicial <- paste0("01/01/", anos[1])
-  data_final <- paste0("31/12/", anos[-1])
+  data_inicial <- paste0("01/01/", head(anos, n = 1))
+  data_final <- paste0("31/12/", tail(anos, n = 1))
   
   proposicoes_votadas <-
     perfilparlamentar::fetch_proposicoes_votadas_senado(data_inicial, data_final) %>% 
