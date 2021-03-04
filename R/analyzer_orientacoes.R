@@ -32,28 +32,23 @@ process_orientacao_por_ano_camara <- function(ano = 2019) {
 #' @param anos Vector com lista de anos
 #' @return Lista contendo orientações
 #' @examples
-#' orientacao <- process_orientacao_anos_url_camara(2019)
-process_orientacao_anos_url_camara <-
-  function(anos = c(2019, 2020, 2021, 2022),
-           url = NULL) {
+#' orientacao <- process_orientacao_anos_camara(2019)
+#' @export
+process_orientacao_anos_camara <-
+  function(anos = c(2019, 2020, 2021)) {
     library(tidyverse)
     library(here)
     
-    if (is.null(url)) {
-      source(here("crawler/proposicoes/utils_proposicoes.R"))
-      url <- .URL_PROPOSICOES_PLENARIO_CAMARA
-    }
-    
     orientacao <- tibble(ano = anos) %>%
       mutate(dados = map(ano,
-                         process_orientacao_por_ano_camara,
-                         url)) %>%
+                         process_orientacao_por_ano_camara)) %>%
       unnest(dados) %>%
       distinct() %>%
       mutate(casa = "camara")
     
     return(orientacao)
-  }
+}
+
 
 #' @title Processa orientação dos votos de plenário para um conjunto de votações
 #' @description Recupera informação das orientações dos partidos para um conjunto de votações
