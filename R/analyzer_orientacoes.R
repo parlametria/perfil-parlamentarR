@@ -32,7 +32,8 @@ process_orientacao_por_ano_camara <- function(ano = 2019) {
 #' @param anos Vector com lista de anos
 #' @return Lista contendo orientações
 #' @examples
-#' orientacao <- process_orientacao_anos_url_camara(2019)
+#' orientacao <- process_orientacao_anos_camara(2019)
+#' @export
 process_orientacao_anos_camara <-
   function(anos = c(2019, 2020, 2021)) {
     library(tidyverse)
