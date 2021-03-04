@@ -80,8 +80,8 @@ process_orientacao_votos_senado <- function(votos) {
     
     orientacoes <- orientacoes_governo %>%
       bind_rows(orientacoes_partido) %>%
-      distinct(id_proposicao, id_votacao, partido_bloco, .keep_all = TRUE) %>%
-      select(id_proposicao, id_votacao, partido_bloco, voto)
+      distinct(id_votacao, partido_bloco, .keep_all = TRUE) %>%
+      select(id_votacao, partido_bloco, voto)
     
     return(orientacoes)
     
