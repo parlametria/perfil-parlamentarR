@@ -75,8 +75,8 @@ process_orientacao_votos_senado <- function(votos) {
     
     orientacoes <- orientacoes_governo %>%
       bind_rows(orientacoes_partido) %>%
-      distinct(id_proposicao, id_votacao, partido_bloco, .keep_all = TRUE) %>%
-      select(id_proposicao, id_votacao, partido_bloco, voto)
+      distinct(id_votacao, partido_bloco, .keep_all = TRUE) %>%
+      select(id_votacao, partido_bloco, voto)
     
     return(orientacoes)
     
@@ -132,11 +132,11 @@ calcula_voto_maioria_absoluta <- function(votos, sigla_partido) {
   print(paste0("Calculando orientação do partido ", sigla_partido))
   
   orientacoes <- votos %>%
-    group_by(id_proposicao, id_votacao, partido, voto) %>%
+    group_by(id_votacao, partido, voto) %>%
     filter(partido == sigla_partido) %>%
     count() %>%
     ungroup() %>%
-    group_by(id_proposicao, id_votacao) %>%
+    group_by(id_votacao) %>%
     filter(n == max(n)) %>%
     mutate(empate = if_else(n() > 1, 1, 0)) %>%
     distinct() %>%
@@ -180,8 +180,7 @@ define_orientacao_governo <- function(votos) {
   orientacoes <- votos %>%
     filter(id_parlamentar %in% lideres$id) %>%
     mutate(partido_bloco = "Governo") %>%
-    select(id_proposicao,
-          id_votacao,
+    select(id_votacao,
            partido_bloco,
            voto)
   
