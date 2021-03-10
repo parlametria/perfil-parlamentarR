@@ -116,7 +116,11 @@ padroniza_sigla <- function(sigla) {
     str_detect(tolower(sigla), "pmdb") ~ "MDB",
     str_detect(tolower(sigla), "patri") ~ "PATRIOTA",
     str_detect(tolower(sigla), "pc do b") ~ "PCdoB",
+    tolower(sigla) == "sd" ~ "SOLIDARIEDADE",
     tolower(sigla) == "pr" ~ "PL",
+    tolower(sigla) == "prb" ~ "REPUBLICANOS",
+    tolower(sigla) == "spart" ~ "SPARTIDO",
+    tolower(sigla) == "pen" ~ "PATRIOTA",
     str_detect(sigla, "SOLID.*") ~ "SOLIDARIEDADE",
     str_detect(sigla, "PODE.*") ~ "PODEMOS",
     str_detect(sigla, "GOV.") ~ "GOVERNO",
@@ -210,4 +214,22 @@ mapeia_nome_eleitoral_to_id_senado <- function(senadores_df, target_df) {
       by=c("nome_eleitoral"))
   
   return(result)
+}
+
+#' @title Separa orientações de bancadas compostas
+#' @description Caso uma bancada possua mais de um partido, esta função retorna um dataset contendo as informações de cada bancada
+#' separadamente
+#' @param orientacoes Dataframe de orientações, contendo a coluna partido_bloco
+#' @return Dataframe contendo a sigla de cada partido
+#' @examples
+#' mutate_sigla_bloco(orientacoes)
+#' @export
+mutate_sigla_bloco <- function(orientacoes) {
+  sigla_bloco <- orientacoes %>% 
+    mutate(partido = strsplit(partido_bloco, "(?<=[a-z])(?=[A|D-Z])", perl = TRUE)) %>% 
+    mutate(partido = purrr::map(partido, ~ as.list(.))) %>%
+    unnest(cols = c(partido)) %>% 
+    unnest(cols = c(partido))
+
+  return(sigla_bloco)
 }
