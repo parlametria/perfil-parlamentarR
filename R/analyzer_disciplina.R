@@ -92,6 +92,7 @@ get_parlamentares_info <- function() {
 #' @return Dataframe de parlamentares e sua disciplina partidária
 #' @examples
 #' processa_disciplina_partidaria(votos, orientacoes)
+#' @export
 processa_disciplina_partidaria <- function(votos, orientacoes) {
   consenso_votacoes <- processa_votacoes_sem_consenso(votos)
   bancada_suficiente <- processa_bancada_suficiente()
