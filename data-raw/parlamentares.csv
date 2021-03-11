@@ -3497,7 +3497,7 @@ legislatura,id_entidade,id_entidade_parlametria,casa,nome,sexo,partido,uf,situac
 55,178898,1178898,camara,Tenente Lúcio,M,PR,MG,Titular,0,1
 55,178901,1178901,camara,Tereza Cristina,F,DEM,MS,Titular,0,1
 55,160617,1160617,camara,Thiago Peixoto,M,PSD,GO,Titular,0,1
-55,178862,1178862,camara,Tia Eron,F,PRB,BA,Titular,0,1
+55,178862,1178862,camara,Tia Eron,F,REPUBLICANOS,BA,Suplente,1,1
 55,160976,1160976,camara,Tiririca,M,PL,SP,Titular,1,1
 55,160611,1160611,camara,Toninho Pinheiro,M,PP,MG,Titular,0,1
 55,178934,1178934,camara,Toninho Wandscheer,M,PROS,PR,Titular,1,1
@@ -4081,7 +4081,7 @@ legislatura,id_entidade,id_entidade_parlametria,casa,nome,sexo,partido,uf,situac
 56,204429,1204429,camara,João H. Campos,M,PSB,PE,Titular,0,1
 56,141459,1141459,camara,João Maia,M,PL,RN,Titular,1,1
 56,112437,1112437,camara,João Marcelo Souza,M,MDB,MA,Titular,1,1
-56,204576,1204576,camara,João Roma,M,REPUBLICANOS,BA,Titular,1,1
+56,204576,1204576,camara,João Roma,M,REPUBLICANOS,BA,Titular,0,1
 56,178910,1178910,camara,Joaquim Passarinho,M,PSD,PA,Titular,1,1
 56,204468,1204468,camara,Joenia Wapichana,F,REDE,RR,Titular,1,1
 56,204546,1204546,camara,Joice Hasselmann,F,PSL,SP,Titular,1,1
@@ -4335,6 +4335,7 @@ legislatura,id_entidade,id_entidade_parlametria,casa,nome,sexo,partido,uf,situac
 56,206231,1206231,camara,Ted Conti,M,PSB,ES,Suplente,1,1
 56,178901,1178901,camara,Tereza Cristina,F,DEM,MS,Titular,0,1
 56,204466,1204466,camara,Tereza Nelma,F,PSDB,AL,Titular,1,1
+56,178862,1178862,camara,Tia Eron,F,REPUBLICANOS,BA,Suplente,1,1
 56,143084,1143084,camara,Tiago Dimas,M,SOLIDARIEDADE,TO,Titular,1,1
 56,204519,1204519,camara,Tiago Mitraud,M,NOVO,MG,Titular,1,1
 56,160976,1160976,camara,Tiririca,M,PL,SP,Titular,1,1
@@ -4412,7 +4413,7 @@ legislatura,id_entidade,id_entidade_parlametria,casa,nome,sexo,partido,uf,situac
 56,5991,25991,senado,Castellar Guimarães Neto,M,NA,MG,1º Suplente,0,1
 56,5593,25593,senado,Celso Dal Lago Rodrigues,M,MDB,MS,1º Suplente,0,1
 56,6000,26000,senado,Chamon,M,NA,PA,2º Suplente,0,1
-56,470,2470,senado,Chico Rodrigues,M,DEM,RR,Titular,0,1
+56,470,2470,senado,Chico Rodrigues,M,DEM,RR,Titular,1,1
 56,611,2611,senado,Chiquinho Feitosa,M,PSDB,CE,1º Suplente,0,1
 56,5623,25623,senado,Christopher Goulart,M,PDT,RS,1º Suplente,0,1
 56,5973,25973,senado,Cid Gomes,M,PDT,CE,Titular,1,1
@@ -4575,7 +4576,7 @@ legislatura,id_entidade,id_entidade_parlametria,casa,nome,sexo,partido,uf,situac
 56,5561,25561,senado,Renilde Bulhões,F,PROS,AL,1º Suplente,0,1
 56,5257,25257,senado,Renzo Braz,M,PP,MG,1º Suplente,0,1
 56,5635,25635,senado,Ricardo Franco,M,DEM,SE,1º Suplente,0,1
-56,5892,25892,senado,Roberth Bringel,M,DEM,MA,2º Suplente,0,1
+56,5892,25892,senado,Roberth Bringel,M,DEM,MA,1º Suplente,0,1
 56,677,2677,senado,Roberto Rocha,M,PSDB,MA,Titular,1,1
 56,5986,25986,senado,Rodolfo Nogueira,M,NA,MS,1º Suplente,0,1
 56,5905,25905,senado,Rodrigo Cunha,M,PSDB,AL,Titular,1,1
@@ -4601,7 +4602,7 @@ legislatura,id_entidade,id_entidade_parlametria,casa,nome,sexo,partido,uf,situac
 56,6005,26005,senado,Siqueira Campos,M,DEM,TO,1º Suplente,0,1
 56,5988,25988,senado,Soraya Thronicke,F,PSL,MS,Titular,1,1
 56,5959,25959,senado,Styvenson Valentim,M,PODEMOS,RN,Titular,1,1
-56,5893,25893,senado,Suely Pereira,M,NA,MA,1º Suplente,0,1
+56,5893,25893,senado,Suely Pereira,M,NA,MA,2º Suplente,0,1
 56,5995,25995,senado,Suely Santiago,F,NA,PB,2º Suplente,0,1
 56,4560,24560,senado,Sérgio Petecão,M,PSD,AC,Titular,1,1
 56,3396,23396,senado,Tasso Jereissati,M,PSDB,CE,Titular,1,1
