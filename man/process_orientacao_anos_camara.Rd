@@ -17,5 +17,5 @@ Recupera informação das orientações dos partidos para um conjunto de anos pa
 proposicoes selecionadas pela equipe VA.
 }
 \examples{
-orientacao <- process_orientacao_anos_url_camara(2019)
+orientacao <- process_orientacao_anos_camara(2019)
 }

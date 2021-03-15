@@ -89,15 +89,22 @@ get_parlamentares_info <- function() {
 #' @param votos Dataframe de votos
 #' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
 #' @param orientacoes Dataframe de orientações
+#' @param enumera_orientacao Flag indicando se as orientações 
+#' precisam ser transformadas em enum.
 #' @return Dataframe de parlamentares e sua disciplina partidária
 #' @examples
 #' processa_disciplina_partidaria(votos, orientacoes)
 #' @export
-processa_disciplina_partidaria <- function(votos, orientacoes) {
+processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientacao = TRUE) {
   consenso_votacoes <- processa_votacoes_sem_consenso(votos)
   bancada_suficiente <- processa_bancada_suficiente()
   parlamentares_info <- get_parlamentares_info()
   lista_votos_validos <- c(-1, 1, 2, 3, 4)
+  
+  if (enumera_orientacao) {
+    orientacoes <- orientacoes %>% 
+      enumera_voto()
+  }
   
   votos_filtrados <- votos %>%
     filter(id_votacao %in% (consenso_votacoes %>% pull(id_votacao))) %>%
@@ -108,7 +115,6 @@ processa_disciplina_partidaria <- function(votos, orientacoes) {
     filter(id_votacao %in% (consenso_votacoes %>% pull(id_votacao))) %>%
     distinct(id_votacao, partido_bloco, .keep_all = TRUE) %>%
     select(id_votacao, voto = orientacao, partido_bloco) %>%
-    enumera_voto() %>%
     select(id_votacao, orientacao = voto, partido_bloco) %>% 
     mutate_sigla_bloco() %>% 
     mutate(partido = padroniza_sigla(partido))
