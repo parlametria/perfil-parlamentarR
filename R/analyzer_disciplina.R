@@ -127,6 +127,7 @@ processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientaca
   
   disciplina <- votos_orientados %>% 
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
+    mutate(seguiu = if_else(voto_valido == 1, seguiu, 0)) %>% 
     group_by(id_parlamentar, casa, partido) %>% 
     summarise(votos_validos = sum(voto_valido), num_seguiu = sum(seguiu)) %>% 
     ungroup() %>% 
