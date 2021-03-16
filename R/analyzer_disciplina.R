@@ -24,6 +24,11 @@ processa_votacoes_sem_consenso <- function(votos, limite_consenso = 0.9) {
   return(votacoes_id)
 }
 
+conta_votacoes_sem_consenso <- function(votos) {
+  votacoes_sem_consenso <- processa_votacoes_sem_consenso(votos) %>% 
+    nrow()
+}
+
 #' @title Participou votações
 #' @description Analisa se o parlamentar participou em mais de 10 votações
 #' @param votos Dataframe de votos.
@@ -84,20 +89,8 @@ get_parlamentares_info <- function() {
   return(parlamentares_info)
 }
 
-#' @title Processa disciplina partidária
-#' @description Processa as votações para filtrar quais não há consenso
-#' @param votos Dataframe de votos
-#' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
-#' @param orientacoes Dataframe de orientações
-#' @return Dataframe de parlamentares e sua disciplina partidária
-#' @examples
-#' processa_disciplina_partidaria(votos, orientacoes)
-#' @export
-processa_disciplina_partidaria <- function(votos, orientacoes) {
+processa_votos_orientados <- function(votos, orientacoes) {
   consenso_votacoes <- processa_votacoes_sem_consenso(votos)
-  bancada_suficiente <- processa_bancada_suficiente()
-  parlamentares_info <- get_parlamentares_info()
-  lista_votos_validos <- c(-1, 1, 2, 3, 4)
   
   votos_filtrados <- votos %>%
     filter(id_votacao %in% (consenso_votacoes %>% pull(id_votacao))) %>%
@@ -112,12 +105,40 @@ processa_disciplina_partidaria <- function(votos, orientacoes) {
     select(id_votacao, orientacao = voto, partido_bloco) %>% 
     mutate_sigla_bloco() %>% 
     mutate(partido = padroniza_sigla(partido))
-
+  
   votos_orientados <- votos_filtrados %>%
     left_join(orientacoes_filtradas, by = c("id_votacao"="id_votacao", "partido")) %>%
     distinct() %>%
     mutate(seguiu = if_else(voto == orientacao, 1, 0)) %>%
     mutate(seguiu = if_else(is.na(seguiu), 0, seguiu))
+  
+  return(votos_orientados)
+}
+
+processa_num_votacoes_parlamentares <- function(votos, orientacoes) {
+  votos_orientados <- processa_votos_orientados(votos, orientacoes)
+  lista_votos_validos <- c(-1, 1, 2, 3, 4)
+  
+  num_votacoes_parlamentares <- votos_orientados %>% 
+    mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
+    group_by(id_parlamentar, casa) %>% 
+    summarise(votos_validos = sum(voto_valido))
+}
+
+#' @title Processa disciplina partidária
+#' @description Processa as votações para filtrar quais não há consenso
+#' @param votos Dataframe de votos
+#' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
+#' @param orientacoes Dataframe de orientações
+#' @return Dataframe de parlamentares e sua disciplina partidária
+#' @examples
+#' processa_disciplina_partidaria(votos, orientacoes)
+#' @export
+processa_disciplina_partidaria <- function(votos, orientacoes) {
+  bancada_suficiente <- processa_bancada_suficiente()
+  parlamentares_info <- get_parlamentares_info()
+  lista_votos_validos <- c(-1, 1, 2, 3, 4)
+  votos_orientados <- processa_votos_orientados(votos, orientacoes)
   
   disciplina <- votos_orientados %>% 
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
