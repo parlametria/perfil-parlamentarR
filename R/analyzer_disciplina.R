@@ -51,7 +51,7 @@ participou_votacoes <- function(parlamentar_id, votos) {
 #' processa_bancada_suficiente()
 processa_bancada_suficiente <- function(minimo_deputados = 5, minimo_senadores = 3) {
   partido_atual <- parlamentares %>%
-    filter(is_parlamentar == 1, legislatura == 56) %>%
+    filter(is_parlamentar == 1, legislatura == 56, em_exercicio == 1) %>%
     group_by(partido, casa) %>%
     summarise(num_parlamentares = n_distinct(id_entidade)) %>%
     ungroup() %>%
@@ -99,7 +99,7 @@ processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientaca
   consenso_votacoes <- processa_votacoes_sem_consenso(votos)
   bancada_suficiente <- processa_bancada_suficiente()
   parlamentares_info <- get_parlamentares_info()
-  lista_votos_validos <- c(-1, 1, 2, 3, 4)
+  lista_votos_validos <- c(-1, 1, 2, 3)
   
   if (enumera_orientacao) {
     orientacoes <- orientacoes %>% 
@@ -143,7 +143,8 @@ processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientaca
     filter(!is.na(id_parlamentar)) %>% 
     select(id_parlamentar, id_parlamentar_parlametria = id_entidade_parlametria,
            partido_disciplina = partido, partido_atual, casa,
-           votos_validos, num_seguiu, disciplina, bancada_suficiente)
+           votos_validos, num_seguiu, disciplina, bancada_suficiente) %>% 
+    mutate(bancada_suficiente = if_else(partido_disciplina == partido_atual, bancada_suficiente, as.logical(NA)))
   
   return(df)
 }
