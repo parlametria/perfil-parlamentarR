@@ -154,15 +154,22 @@ processa_num_votacoes_parlamentares <- function(votos, orientacoes) {
 #' @param votos Dataframe de votos
 #' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
 #' @param orientacoes Dataframe de orientações
+#' @param enumera_orientacao Flag indicando se as orientações 
+#' precisam ser transformadas em enum.
 #' @return Dataframe de parlamentares e sua disciplina partidária
 #' @examples
 #' processa_disciplina_partidaria(votos, orientacoes)
 #' @export
-processa_disciplina_partidaria <- function(votos, orientacoes) {
+processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientacao = TRUE) {
   bancada_suficiente <- processa_bancada_suficiente()
   parlamentares_info <- get_parlamentares_info()
   lista_votos_validos <- c(-1, 1, 2, 3, 4)
   votos_orientados <- processa_votos_orientados(votos, orientacoes)
+    
+  if (enumera_orientacao) {
+    orientacoes <- orientacoes %>% 
+      enumera_voto()
+  }
   
   disciplina <- votos_orientados %>% 
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
