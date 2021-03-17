@@ -4,16 +4,13 @@
 \alias{processa_disciplina_partidaria}
 \title{Processa disciplina partidária}
 \usage{
-processa_disciplina_partidaria(votos, orientacoes, enumera_orientacao = TRUE)
+processa_disciplina_partidaria(votos, orientacoes)
 }
 \arguments{
 \item{votos}{Dataframe de votos
 Os votos devem ter pelo menos 2 colunas: id_votacao e voto.}
 
 \item{orientacoes}{Dataframe de orientações}
-
-\item{enumera_orientacao}{Flag indicando se as orientações 
-precisam ser transformadas em enum.}
 }
 \value{
 Dataframe de parlamentares e sua disciplina partidária
