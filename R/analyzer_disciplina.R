@@ -62,7 +62,7 @@ participou_votacoes <- function(parlamentar_id, votos) {
 #' processa_bancada_suficiente()
 processa_bancada_suficiente <- function(minimo_deputados = 5, minimo_senadores = 3) {
   partido_atual <- parlamentares %>%
-    filter(is_parlamentar == 1, legislatura == 56) %>%
+    filter(is_parlamentar == 1, legislatura == 56, em_exercicio == 1) %>%
     group_by(partido, casa) %>%
     summarise(num_parlamentares = n_distinct(id_entidade)) %>%
     ungroup() %>%
@@ -115,7 +115,6 @@ processa_votos_orientados <- function(votos, orientacoes) {
     filter(id_votacao %in% (consenso_votacoes %>% pull(id_votacao))) %>%
     distinct(id_votacao, partido_bloco, .keep_all = TRUE) %>%
     select(id_votacao, voto = orientacao, partido_bloco) %>%
-    enumera_voto() %>%
     select(id_votacao, orientacao = voto, partido_bloco) %>% 
     mutate_sigla_bloco() %>% 
     mutate(partido = padroniza_sigla(partido))
@@ -154,18 +153,26 @@ processa_num_votacoes_parlamentares <- function(votos, orientacoes) {
 #' @param votos Dataframe de votos
 #' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
 #' @param orientacoes Dataframe de orientações
+#' @param enumera_orientacao Flag indicando se as orientações 
+#' precisam ser transformadas em enum.
 #' @return Dataframe de parlamentares e sua disciplina partidária
 #' @examples
 #' processa_disciplina_partidaria(votos, orientacoes)
 #' @export
-processa_disciplina_partidaria <- function(votos, orientacoes) {
+processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientacao = TRUE) {
   bancada_suficiente <- processa_bancada_suficiente()
   parlamentares_info <- get_parlamentares_info()
   lista_votos_validos <- c(-1, 1, 2, 3, 4)
   votos_orientados <- processa_votos_orientados(votos, orientacoes)
+    
+  if (enumera_orientacao) {
+    orientacoes <- orientacoes %>% 
+      enumera_voto()
+  }
   
   disciplina <- votos_orientados %>% 
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
+    mutate(seguiu = if_else(voto_valido == 1, seguiu, 0)) %>% 
     group_by(id_parlamentar, casa, partido) %>% 
     summarise(votos_validos = sum(voto_valido), num_seguiu = sum(seguiu)) %>% 
     ungroup() %>% 
@@ -181,7 +188,8 @@ processa_disciplina_partidaria <- function(votos, orientacoes) {
     filter(!is.na(id_parlamentar)) %>% 
     select(id_parlamentar, id_parlamentar_parlametria = id_entidade_parlametria,
            partido_disciplina = partido, partido_atual, casa,
-           votos_validos, num_seguiu, disciplina, bancada_suficiente)
+           votos_validos, num_seguiu, disciplina, bancada_suficiente) %>% 
+    mutate(bancada_suficiente = if_else(partido_disciplina == partido_atual, bancada_suficiente, as.logical(NA)))
   
   return(df)
 }
