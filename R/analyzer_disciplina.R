@@ -1,7 +1,6 @@
 #' @title Processa votações sem consenso
 #' @description Processa as votações para filtrar quais não há consenso
-#' @param votos Dataframe de votos. Os votos devem ser de uma mesma casa.
-#' Ou seja ou câmara ou senado. Devem ter pelo menos 2 colunas: id_votacao e voto.
+#' @param votos Dataframe de votos. Devem ter pelo menos 2 colunas: id_votacao e voto.
 #' @return Dataframe com votações e as proporções de consenso
 #' @examples
 #' processa_votacoes_sem_consenso(votos)
@@ -24,6 +23,13 @@ processa_votacoes_sem_consenso <- function(votos, limite_consenso = 0.9) {
   return(votacoes_id)
 }
 
+#' @title Conta votações sem consenso
+#' @description Conta quantas votações ocorerram em quais não há consenso
+#' @param votos Dataframe de votos. Devem ter pelo menos 2 colunas: id_votacao e voto.
+#' @return Número indicando a quantidade de votações
+#' @examples
+#' conta_votacoes_sem_consenso(votos)
+#' @export
 conta_votacoes_sem_consenso <- function(votos) {
   votacoes_sem_consenso <- processa_votacoes_sem_consenso(votos) %>% 
     nrow()
@@ -89,6 +95,14 @@ get_parlamentares_info <- function() {
   return(parlamentares_info)
 }
 
+#' @title Processa votos orientados
+#' @description Processa os votos e suas orientações
+#' @param votos Dataframe de votos
+#' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
+#' @param orientacoes Dataframe de orientações
+#' @return Dataframe com o que cada parlamentar votou e qual era a orientação do partido
+#' @examples
+#' processa_votos_orientados(votos, orientacoes)
 processa_votos_orientados <- function(votos, orientacoes) {
   consenso_votacoes <- processa_votacoes_sem_consenso(votos)
   
@@ -115,6 +129,15 @@ processa_votos_orientados <- function(votos, orientacoes) {
   return(votos_orientados)
 }
 
+#' @title Processa num votações parlamantares
+#' @description Processa o número total de votações para cada parlamentar
+#' @param votos Dataframe de votos
+#' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
+#' @param orientacoes Dataframe de orientações
+#' @return Dataframe com o id do parlamentar e quantas vezes ele votou
+#' @examples
+#' processa_num_votacoes_parlamentares(votos, orientacoes)
+#' @export
 processa_num_votacoes_parlamentares <- function(votos, orientacoes) {
   votos_orientados <- processa_votos_orientados(votos, orientacoes)
   lista_votos_validos <- c(-1, 1, 2, 3, 4)
@@ -122,7 +145,8 @@ processa_num_votacoes_parlamentares <- function(votos, orientacoes) {
   num_votacoes_parlamentares <- votos_orientados %>% 
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
     group_by(id_parlamentar, casa) %>% 
-    summarise(votos_validos = sum(voto_valido))
+    summarise(votos_validos = sum(voto_valido)) %>% 
+    filter(!is.na(id_parlamentar))
 }
 
 #' @title Processa disciplina partidária
