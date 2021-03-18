@@ -7,16 +7,16 @@
 processa_votacoes_sem_consenso <- function(votos, limite_consenso = 0.9) {
   votacoes_proporcao <- votos %>%
     filter(voto != 0) %>%
-    group_by(id_votacao) %>%
+    group_by(id_votacao, casa) %>%
     mutate(votos_validos = n()) %>%
     ungroup() %>%
-    group_by(id_votacao, voto, votos_validos) %>%
+    group_by(id_votacao, casa, voto, votos_validos) %>%
     summarise(contagem = n()) %>%
     ungroup() %>%
     mutate(proporcao = contagem/votos_validos)
   
   votacoes_id <- votacoes_proporcao %>%
-    group_by(id_votacao) %>%
+    group_by(id_votacao, casa) %>%
     summarise(proporcao_max = max(proporcao)) %>%
     filter(proporcao_max < limite_consenso)
   
@@ -25,14 +25,15 @@ processa_votacoes_sem_consenso <- function(votos, limite_consenso = 0.9) {
 
 #' @title Conta votações sem consenso
 #' @description Conta quantas votações ocorerram em quais não há consenso
-#' @param votos Dataframe de votos. Devem ter pelo menos 2 colunas: id_votacao e voto.
-#' @return Número indicando a quantidade de votações
+#' @param votos Dataframe de votos. Devem ter pelo menos 3 colunas: id_votacao, casa e voto.
+#' @return Dataframe indicando a quantidade de votações sem consenso por casa
 #' @examples
 #' conta_votacoes_sem_consenso(votos)
 #' @export
 conta_votacoes_sem_consenso <- function(votos) {
   votacoes_sem_consenso <- processa_votacoes_sem_consenso(votos) %>% 
-    nrow()
+    group_by(casa) %>% 
+    summarise(num_votacoes = n())
 }
 
 #' @title Participou votações
