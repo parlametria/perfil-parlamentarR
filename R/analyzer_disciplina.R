@@ -7,16 +7,16 @@
 processa_votacoes_sem_consenso <- function(votos, limite_consenso = 0.9) {
   votacoes_proporcao <- votos %>%
     filter(voto != 0) %>%
-    group_by(id_votacao) %>%
+    group_by(id_votacao, casa) %>%
     mutate(votos_validos = n()) %>%
     ungroup() %>%
-    group_by(id_votacao, voto, votos_validos) %>%
+    group_by(id_votacao, casa, voto, votos_validos) %>%
     summarise(contagem = n()) %>%
     ungroup() %>%
     mutate(proporcao = contagem/votos_validos)
   
   votacoes_id <- votacoes_proporcao %>%
-    group_by(id_votacao) %>%
+    group_by(id_votacao, casa) %>%
     summarise(proporcao_max = max(proporcao)) %>%
     filter(proporcao_max < limite_consenso)
   
@@ -25,14 +25,15 @@ processa_votacoes_sem_consenso <- function(votos, limite_consenso = 0.9) {
 
 #' @title Conta votações sem consenso
 #' @description Conta quantas votações ocorerram em quais não há consenso
-#' @param votos Dataframe de votos. Devem ter pelo menos 2 colunas: id_votacao e voto.
-#' @return Número indicando a quantidade de votações
+#' @param votos Dataframe de votos. Devem ter pelo menos 3 colunas: id_votacao, casa e voto.
+#' @return Dataframe indicando a quantidade de votações sem consenso por casa
 #' @examples
 #' conta_votacoes_sem_consenso(votos)
 #' @export
 conta_votacoes_sem_consenso <- function(votos) {
   votacoes_sem_consenso <- processa_votacoes_sem_consenso(votos) %>% 
-    nrow()
+    group_by(casa) %>% 
+    summarise(num_votacoes = n())
 }
 
 #' @title Participou votações
@@ -189,6 +190,7 @@ processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientaca
 
   disciplina <- parlamentares_presentes %>% 
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
+    mutate(seguiu = if_else(voto_valido == 1, seguiu, 0)) %>% 
     group_by(id_parlamentar, casa, partido) %>% 
     summarise(votos_validos = sum(voto_valido), num_seguiu = sum(seguiu)) %>% 
     ungroup() %>% 
@@ -203,7 +205,8 @@ processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientaca
     filter(!is.na(id_parlamentar)) %>% 
     select(id_parlamentar, id_parlamentar_parlametria = id_entidade_parlametria,
            partido_disciplina = partido, partido_atual, casa,
-           votos_validos, num_seguiu, disciplina, bancada_suficiente)
+           votos_validos, num_seguiu, disciplina, bancada_suficiente) %>% 
+    mutate(bancada_suficiente = if_else(partido_disciplina == partido_atual, bancada_suficiente, as.logical(NA)))
   
   return(df)
 }
