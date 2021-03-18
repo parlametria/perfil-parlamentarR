@@ -22,5 +22,5 @@ Dataframe com o que cada parlamentar votou e qual era a orientação do partido
 Processa os votos e suas orientações
 }
 \examples{
-processa_votos_orientados(votos, orientacoes)
+processa_votos_orientados(votos, orientacoes, enumera_orientacao)
 }

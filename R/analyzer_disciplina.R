@@ -38,20 +38,25 @@ conta_votacoes_sem_consenso <- function(votos) {
 #' @title Participou votações
 #' @description Analisa se o parlamentar participou em mais de 10 votações
 #' @param votos Dataframe de votos.
-#' @param parlamentar_id Id de um parlamentar.
-#' @return TRUE caso o parlamentar tenha participado em mais de 10 votações
+#' @param orientacoes Dataframe de orientações
+#' @param enumera_orientacao Flag indicando se as orientações 
+#' precisam ser transformadas em enum.
+#' @return Dataframe com id e casa do parlamentar e quantas votações ele participou
 #' @examples
-#' participou_votacoes(285, votos)
-participou_votacoes <- function(parlamentar_id, votos) {
-  quantidade <- votos %>%
-    filter(id_parlamentar == parlamentar_id) %>%
-    nrow()
+#' participou_votacoes(votos, orientacoes, enumera_orientacao)
+participou_votacoes <- function(votos, orientacoes, enumera_orientacao) {
+  parlamentares_info <- get_parlamentares_info()
+  votos_orientados <- processa_votos_orientados(votos, orientacoes, enumera_orientacao)
+  lista_votos_validos <- c(-1, 1, 2, 3)
   
-  if(quantidade > 10) {
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
+  quantidade_votacoes <- parlamentares_info %>% 
+    left_join(votos_orientados, by = c("id_entidade_parlametria"="id_parlamentar_parlametria", "casa")) %>%
+    filter(!is.na(voto)) %>% 
+    mutate(votou = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
+    mutate(num_votacoes = sum(votou)) %>% 
+    distinct(id_entidade, id_entidade_parlametria, num_votacoes, casa)
+
+  return(quantidade_votacoes)
 }
 
 #' @title Processa bancada suficiente
@@ -104,7 +109,7 @@ get_parlamentares_info <- function() {
 #' precisam ser transformadas em enum.
 #' @return Dataframe com o que cada parlamentar votou e qual era a orientação do partido
 #' @examples
-#' processa_votos_orientados(votos, orientacoes)
+#' processa_votos_orientados(votos, orientacoes, enumera_orientacao)
 processa_votos_orientados <- function(votos, orientacoes, enumera_orientacao = TRUE) {
   consenso_votacoes <- processa_votacoes_sem_consenso(votos)
   
@@ -140,12 +145,14 @@ processa_votos_orientados <- function(votos, orientacoes, enumera_orientacao = T
 #' @param votos Dataframe de votos
 #' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
 #' @param orientacoes Dataframe de orientações
+#' @param enumera_orientacao Flag indicando se as orientações 
+#' precisam ser transformadas em enum.
 #' @return Dataframe com o id do parlamentar e quantas vezes ele votou
 #' @examples
 #' processa_num_votacoes_parlamentares(votos, orientacoes)
 #' @export
-processa_num_votacoes_parlamentares <- function(votos, orientacoes) {
-  votos_orientados <- processa_votos_orientados(votos, orientacoes)
+processa_num_votacoes_parlamentares <- function(votos, orientacoes, enumera_orientacao) {
+  votos_orientados <- processa_votos_orientados(votos, orientacoes, enumera_orientacao)
   lista_votos_validos <- c(-1, 1, 2, 3)
   
   num_votacoes_parlamentares <- votos_orientados %>% 
@@ -160,23 +167,32 @@ processa_num_votacoes_parlamentares <- function(votos, orientacoes) {
 #' @param votos Dataframe de votos
 #' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
 #' @param orientacoes Dataframe de orientações
+#' @param enumera_orientacao Flag indicando se as orientações 
+#' precisam ser transformadas em enum.
 #' @return Dataframe de parlamentares e sua disciplina partidária
 #' @examples
-#' processa_disciplina_partidaria(votos, orientacoes)
+#' processa_disciplina_partidaria(votos, orientacoes, enumera_orientacao)
 #' @export
-processa_disciplina_partidaria <- function(votos, orientacoes) {
+processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientacao) {
   bancada_suficiente <- processa_bancada_suficiente()
   parlamentares_info <- get_parlamentares_info()
   lista_votos_validos <- c(-1, 1, 2, 3)
-  votos_orientados <- processa_votos_orientados(votos, orientacoes)
+  votos_orientados <- processa_votos_orientados(votos, orientacoes, enumera_orientacao)
+  quantidade_votacoes_parlamentar <- participou_votacoes(votos, orientacoes, enumera_orientacao)
+  
+  parlamentares_presentes <- votos_orientados %>% 
+    left_join(
+      quantidade_votacoes_parlamentar,
+      by = c("id_parlamentar_parlametria" = "id_entidade_parlametria", "casa")
+    ) %>%
+    filter(num_votacoes > 10)
 
-  disciplina <- votos_orientados %>% 
+  disciplina <- parlamentares_presentes %>% 
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
     group_by(id_parlamentar, casa, partido) %>% 
     summarise(votos_validos = sum(voto_valido), num_seguiu = sum(seguiu)) %>% 
     ungroup() %>% 
     mutate(disciplina = num_seguiu/votos_validos) %>% 
-    mutate(id_parlamentar = as.character(id_parlamentar)) %>% 
     mutate(partido = padroniza_sigla(partido))
   
   df <- disciplina %>% 

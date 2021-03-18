@@ -4,13 +4,16 @@
 \alias{processa_num_votacoes_parlamentares}
 \title{Processa num votações parlamantares}
 \usage{
-processa_num_votacoes_parlamentares(votos, orientacoes)
+processa_num_votacoes_parlamentares(votos, orientacoes, enumera_orientacao)
 }
 \arguments{
 \item{votos}{Dataframe de votos
 Os votos devem ter pelo menos 2 colunas: id_votacao e voto.}
 
 \item{orientacoes}{Dataframe de orientações}
+
+\item{enumera_orientacao}{Flag indicando se as orientações 
+precisam ser transformadas em enum.}
 }
 \value{
 Dataframe com o id do parlamentar e quantas vezes ele votou
