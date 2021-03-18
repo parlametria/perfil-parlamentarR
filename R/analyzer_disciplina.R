@@ -189,6 +189,7 @@ processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientaca
 
   disciplina <- parlamentares_presentes %>% 
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
+    mutate(seguiu = if_else(voto_valido == 1, seguiu, 0)) %>%
     group_by(id_parlamentar, casa, partido) %>% 
     summarise(votos_validos = sum(voto_valido), num_seguiu = sum(seguiu)) %>% 
     ungroup() %>% 
@@ -203,7 +204,8 @@ processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientaca
     filter(!is.na(id_parlamentar)) %>% 
     select(id_parlamentar, id_parlamentar_parlametria = id_entidade_parlametria,
            partido_disciplina = partido, partido_atual, casa,
-           votos_validos, num_seguiu, disciplina, bancada_suficiente)
+           votos_validos, num_seguiu, disciplina, bancada_suficiente) %>% 
+    mutate(bancada_suficiente = if_else(partido_disciplina == partido_atual, bancada_suficiente, as.logical(NA)))
   
   return(df)
 }
