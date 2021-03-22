@@ -7,8 +7,7 @@
 processa_votacoes_sem_consenso(votos, limite_consenso = 0.9)
 }
 \arguments{
-\item{votos}{Dataframe de votos. Os votos devem ser de uma mesma casa.
-Ou seja ou câmara ou senado. Devem ter pelo menos 2 colunas: id_votacao e voto.}
+\item{votos}{Dataframe de votos. Devem ter pelo menos 2 colunas: id_votacao e voto.}
 }
 \value{
 Dataframe com votações e as proporções de consenso

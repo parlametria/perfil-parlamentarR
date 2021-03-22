@@ -4,19 +4,22 @@
 \alias{participou_votacoes}
 \title{Participou votações}
 \usage{
-participou_votacoes(parlamentar_id, votos)
+participou_votacoes(votos, orientacoes, enumera_orientacao)
 }
 \arguments{
-\item{parlamentar_id}{Id de um parlamentar.}
-
 \item{votos}{Dataframe de votos.}
+
+\item{orientacoes}{Dataframe de orientações}
+
+\item{enumera_orientacao}{Flag indicando se as orientações 
+precisam ser transformadas em enum.}
 }
 \value{
-TRUE caso o parlamentar tenha participado em mais de 10 votações
+Dataframe com id e casa do parlamentar e quantas votações ele participou
 }
 \description{
 Analisa se o parlamentar participou em mais de 10 votações
 }
 \examples{
-participou_votacoes(285, votos)
+participou_votacoes(votos, orientacoes, enumera_orientacao)
 }
