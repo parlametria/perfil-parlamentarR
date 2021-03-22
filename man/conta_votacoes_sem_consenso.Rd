@@ -7,10 +7,10 @@
 conta_votacoes_sem_consenso(votos)
 }
 \arguments{
-\item{votos}{Dataframe de votos. Devem ter pelo menos 2 colunas: id_votacao e voto.}
+\item{votos}{Dataframe de votos. Devem ter pelo menos 3 colunas: id_votacao, casa e voto.}
 }
 \value{
-Número indicando a quantidade de votações
+Dataframe indicando a quantidade de votações sem consenso por casa
 }
 \description{
 Conta quantas votações ocorerram em quais não há consenso
