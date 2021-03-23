@@ -93,11 +93,11 @@ processa_bancada_suficiente <- function(minimo_deputados = 5, minimo_senadores =
 #' get_parlamentares_info()
 get_parlamentares_info <- function() {
   parlamentares_info <- parlamentares %>% 
+    mutate(id_entidade_parlametria = as.numeric(id_entidade_parlametria),
+           id_entidade = as.numeric(id_entidade)) %>% 
     group_by(id_entidade) %>% 
     mutate(ultima_legislatura = max(legislatura)) %>% 
     filter(is_parlamentar == 1, legislatura == ultima_legislatura) %>% 
-    mutate(id_entidade_parlametria = as.numeric(id_entidade_parlametria),
-           id_entidade = as.numeric(id_entidade)) %>% 
     select(id_entidade, id_entidade_parlametria, casa, nome, uf, partido_atual = partido)
   
   return(parlamentares_info)
