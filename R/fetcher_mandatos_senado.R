@@ -10,7 +10,7 @@ fetch_mandatos_senado <- function(id_senador) {
   library(fuzzyjoin)
   
   url <-
-    paste0("http://legis.senado.leg.br/dadosabertos/senador/",
+    paste0("https://legis.senado.leg.br/dadosabertos/senador/",
            id_senador,
            "/mandatos")
   

@@ -8,7 +8,7 @@
   library(tidyverse)
   library(here)
   
-  url <- "http://legis.senado.leg.br/dadosabertos/plenario/lista/liderancas"
+  url <- "https://legis.senado.leg.br/dadosabertos/plenario/lista/liderancas"
   
   tryCatch({
     xml <- RCurl::getURL(url, .encoding = "Windows-1252") %>% xml2::read_xml()

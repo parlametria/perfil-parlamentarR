@@ -14,7 +14,7 @@ fetcher_proposicoes_em_intervalo_senado <-
     
     url <-
       paste0(
-        "http://legis.senado.leg.br/dadosabertos/materia/pesquisa/lista?dataInicioApresentacao=",
+        "https://legis.senado.leg.br/dadosabertos/materia/pesquisa/lista?dataInicioApresentacao=",
         gsub("-", "", data_inicial),
         "&dataFimApresentacao=",
         gsub("-", "", data_final)
