@@ -40,6 +40,7 @@ processa_votacoes_sumarizadas <- function(votos, orientacoes) {
     distinct(
       id_parlamentar,
       id_parlamentar_parlametria,
+      casa,
       num_votacoes_parlamentar_disciplina,
       num_votacoes_totais_disciplina
     )
@@ -62,7 +63,7 @@ processa_votacoes_sumarizadas <- function(votos, orientacoes) {
     )
   
   votos_sumarizados <- votos_disciplina %>%
-    left_join(votos_governismo,
+    full_join(votos_governismo,
               by = c("id_parlamentar", "id_parlamentar_parlametria", "casa")) %>%
     filter(!is.na(id_parlamentar)) %>%
     select(
