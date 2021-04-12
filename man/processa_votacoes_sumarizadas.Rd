@@ -4,10 +4,12 @@
 \alias{processa_votacoes_sumarizadas}
 \title{Processa votações sumarizadas}
 \usage{
-processa_votacoes_sumarizadas(votos)
+processa_votacoes_sumarizadas(votos, orientacoes)
 }
 \arguments{
 \item{votos}{Dataframe de votos. Devem ter pelo menos 2 colunas: id_votacao e voto.}
+
+\item{orientacoes}{Dataframe de orientações.}
 }
 \value{
 Dataframe com ids de parlamentares e quantidade de votos

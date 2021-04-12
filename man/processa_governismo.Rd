@@ -14,7 +14,8 @@ Ou seja ou câmara ou senado. Devem ter pelo menos 3 colunas: id_votacao, id_par
 Dataframe com parlamentares e as dimensões para o Governismo
 }
 \description{
-Calcula Governismo usando a técnica de ideal points
+Calcula Governismo usando a técnica de ideal points. 
+Apenas parlamentares com 10 ou mais votos válidos tem seu governismo calculado.
 }
 \examples{
 processa_governismo(votos)

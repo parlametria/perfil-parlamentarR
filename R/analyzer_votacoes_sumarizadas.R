@@ -1,6 +1,7 @@
 #' @title Processa votações sumarizadas
 #' @description Processa o número de votações por parlamentar com filtros de governismo e disciplina
 #' @param votos Dataframe de votos. Devem ter pelo menos 2 colunas: id_votacao e voto.
+#' @param orientacoes Dataframe de orientações. 
 #' @return Dataframe com ids de parlamentares e quantidade de votos
 #' @examples
 #' processa_votacoes_sumarizadas(votos)
@@ -9,7 +10,7 @@ processa_votacoes_sumarizadas <- function(votos, orientacoes) {
   votos <-
     votos %>% filter(!is.na(id_parlamentar_parlametria) |
                        !is.na(id_parlamentar))
-  # votacoes_disciplina <- processa_votacoes_sem_consenso(votos)
+
   votos_orientados <- processa_votos_orientados(votos, orientacoes, F)
   lista_votos_validos <- c(-1, 1, 2, 3)
   
