@@ -5,27 +5,37 @@
 #' @examples
 #' processa_votacoes_sumarizadas(votos)
 #' @export
-processa_votacoes_sumarizadas <- function(votos) {
+processa_votacoes_sumarizadas <- function(votos, orientacoes) {
   votos <-
     votos %>% filter(!is.na(id_parlamentar_parlametria) |
                        !is.na(id_parlamentar))
-  votacoes_disciplina <- processa_votacoes_sem_consenso(votos)
+  # votacoes_disciplina <- processa_votacoes_sem_consenso(votos)
+  votos_orientados <- processa_votos_orientados(votos, orientacoes, F)
   lista_votos_validos <- c(-1, 1, 2, 3)
   
   parlamentares_info <- get_parlamentares_info() %>%
-    select(id_entidade, id_entidade_parlametria)
+    ungroup() %>% 
+    select(id_entidade_parlametria, partido_atual)
   
-  votos_disciplina <- votacoes_disciplina %>%
-    left_join(votos, by = c("id_votacao", "casa")) %>%
+  orientacoes_validas <- votos_orientados %>% 
+    distinct(id_votacao, partido, casa, orientacao) %>% 
+    filter(orientacao %in% lista_votos_validos) %>% 
+    group_by(partido, casa) %>% 
+    summarise(num_votacoes_totais_disciplina = n_distinct(id_votacao)) %>% 
+    ungroup()
+  
+  votos_disciplina <- votos_orientados %>%
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>%
-    group_by(id_parlamentar_parlametria) %>%
-    mutate(num_votacoes_parlamentar_disciplina = sum(voto_valido)) %>%
-    group_by(casa) %>%
-    mutate(num_votacoes_totais_disciplina = n_distinct(id_votacao)) %>%
+    mutate(voto_valido_com_orientacao = if_else(voto_valido == 1 & (orientacao %in% lista_votos_validos), 1, 0)) %>% 
+    group_by(id_parlamentar, id_parlamentar_parlametria, casa, partido) %>%
+    summarise(num_votacoes_parlamentar_disciplina = sum(voto_valido_com_orientacao), .groups = "drop") %>%
+    ungroup() %>%
+    left_join(orientacoes_validas, by = c("partido", "casa")) %>% 
     inner_join(
       parlamentares_info,
       by = c("id_parlamentar_parlametria" = "id_entidade_parlametria")
     ) %>%
+    filter(partido == partido_atual) %>% 
     distinct(
       id_parlamentar,
       id_parlamentar_parlametria,
