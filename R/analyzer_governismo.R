@@ -1,8 +1,30 @@
 library(tidyverse)
 library(pscl)
 
+#' @title Processa a quantidade de votos válidos dos parlamentares
+#' @description Processa o número total de votações para cada parlamentar
+#' @param votos Dataframe de votos
+#' Os votos devem ter pelo menos 2 colunas: id_votacao e voto.
+#' @return Dataframe com o id do parlamentar e quantas vezes ele votou
+#' @examples
+#' .processa_quantidade_votos(votos)
+#' @export
+.processa_quantidade_votos <- function(votos) {
+  lista_votos_validos <- c(-1, 1, 2, 3)
+  
+  num_votacoes_parlamentares <- votos %>% 
+    mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
+    group_by(id_parlamentar, casa) %>% 
+    summarise(votos_validos = sum(voto_valido)) %>% 
+    ungroup() %>% 
+    filter(!is.na(id_parlamentar))
+  
+  return(num_votacoes_parlamentares)
+}
+
 #' @title Calcula Governismo
-#' @description Calcula Governismo usando a técnica de ideal points
+#' @description Calcula Governismo usando a técnica de ideal points. 
+#' Apenas parlamentares com 10 ou mais votos válidos tem seu governismo calculado.
 #' @param votos Dataframe de votos para cálculo do Governismo. Os votos devem ser de uma mesma casa.
 #' Ou seja ou câmara ou senado. Devem ter pelo menos 3 colunas: id_votacao, id_parlamentar e voto.
 #' @return Dataframe com parlamentares e as dimensões para o Governismo
@@ -26,6 +48,8 @@ processa_governismo <- function(votos) {
       voto == 0 ~ 0,
       TRUE ~ 9,
     ))
+  
+  num_votos_validos <- .processa_quantidade_votos(votos)
   
   spread_votos <- votos_alt %>% 
     distinct(id_votacao, id_parlamentar, voto) %>% 
@@ -62,6 +86,14 @@ processa_governismo <- function(votos) {
   results <- tibble(id_parlamentar = rownames(ideal_df),
                     D1 = ideal_df %>% pull(D1),
                     D2 = ideal_df %>% pull(D2))
+  
+  .QUANTIDADE_MINIMA_DE_VOTOS_VALIDOS <- 10
+
+  parlamentares_governismo <- results %>% 
+    left_join(num_votos_validos, by = "id_parlamentar") %>% 
+    mutate(D1 = if_else(votos_validos < .QUANTIDADE_MINIMA_DE_VOTOS_VALIDOS, NA_real_, D1),
+           D2 = if_else(votos_validos < .QUANTIDADE_MINIMA_DE_VOTOS_VALIDOS, NA_real_, D2)) %>% 
+    select(id_parlamentar, D1, D2)
   
   return(results)
 }

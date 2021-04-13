@@ -115,6 +115,7 @@ get_parlamentares_info <- function() {
 #' processa_votos_orientados(votos, orientacoes, enumera_orientacao)
 processa_votos_orientados <- function(votos, orientacoes, enumera_orientacao = TRUE) {
   consenso_votacoes <- processa_votacoes_sem_consenso(votos)
+  lista_votos_validos <- c(-1, 1, 2, 3)
   
   if (enumera_orientacao) {
     orientacoes <- orientacoes %>% 
@@ -137,7 +138,7 @@ processa_votos_orientados <- function(votos, orientacoes, enumera_orientacao = T
   votos_orientados <- votos_filtrados %>%
     left_join(orientacoes_filtradas, by = c("id_votacao"="id_votacao", "partido")) %>%
     distinct() %>%
-    mutate(seguiu = if_else(voto == orientacao, 1, 0)) %>%
+    mutate(seguiu = if_else(voto == orientacao & (orientacao %in% lista_votos_validos), 1, 0)) %>%
     mutate(seguiu = if_else(is.na(seguiu), 0, seguiu))
   
   return(votos_orientados)
@@ -181,23 +182,18 @@ processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientaca
   parlamentares_info <- get_parlamentares_info()
   lista_votos_validos <- c(-1, 1, 2, 3)
   votos_orientados <- processa_votos_orientados(votos, orientacoes, enumera_orientacao)
-  quantidade_votacoes_parlamentar <- participou_votacoes(votos, orientacoes, enumera_orientacao)
-  
-  parlamentares_presentes <- votos_orientados %>% 
-    left_join(
-      quantidade_votacoes_parlamentar,
-      by = c("id_parlamentar_parlametria" = "id_entidade_parlametria", "casa")
-    ) %>%
-    filter(num_votacoes > 10)
+  .QUANTIDADE_MINIMA_DE_VOTOS_VALIDOS <- 10
 
-  disciplina <- parlamentares_presentes %>% 
+  disciplina <- votos_orientados %>% 
     mutate(voto_valido = if_else(voto %in% lista_votos_validos, 1, 0)) %>% 
-    mutate(seguiu = if_else(voto_valido == 1, seguiu, 0)) %>%
+    mutate(voto_valido_com_orientacao = if_else(voto_valido == 1 & (orientacao %in% lista_votos_validos), 1, 0)) %>% 
+    mutate(seguiu = if_else(voto_valido_com_orientacao == 1, seguiu, 0)) %>%
     group_by(id_parlamentar, casa, partido) %>% 
-    summarise(votos_validos = sum(voto_valido), num_seguiu = sum(seguiu)) %>% 
+    summarise(votos_validos = sum(voto_valido_com_orientacao), num_seguiu = sum(seguiu)) %>% 
     ungroup() %>% 
-    mutate(disciplina = num_seguiu/votos_validos) %>% 
-    mutate(partido = padroniza_sigla(partido))
+    mutate(disciplina = num_seguiu/votos_validos) %>% ## considera apenas os votos válidos com orientação
+    mutate(partido = padroniza_sigla(partido)) %>% 
+    mutate(disciplina = if_else(votos_validos < .QUANTIDADE_MINIMA_DE_VOTOS_VALIDOS, NA_real_, disciplina))
   
   df <- disciplina %>% 
     left_join(parlamentares_info %>% select(uf, nome, id_entidade, id_entidade_parlametria, partido_atual, casa), 
@@ -205,9 +201,9 @@ processa_disciplina_partidaria <- function(votos, orientacoes, enumera_orientaca
     left_join(bancada_suficiente, by = c("partido_atual"="partido", "casa")) %>% 
     mutate(partido_atual = padroniza_sigla(partido_atual)) %>% 
     filter(!is.na(id_parlamentar)) %>% 
-    select(id_parlamentar, id_parlamentar_parlametria = id_entidade_parlametria,
+    select(id_parlamentar, id_parlamentar_parlametria = id_entidade_parlametria, 
            partido_disciplina = partido, partido_atual, casa,
-           votos_validos, num_seguiu, disciplina, bancada_suficiente) %>% 
+           votos_validos, num_seguiu, disciplina, bancada_suficiente) %>%
     mutate(bancada_suficiente = if_else(partido_disciplina == partido_atual, bancada_suficiente, as.logical(NA)))
   
   return(df)
