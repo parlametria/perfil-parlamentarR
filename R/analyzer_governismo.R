@@ -95,5 +95,5 @@ processa_governismo <- function(votos) {
            D2 = if_else(votos_validos < .QUANTIDADE_MINIMA_DE_VOTOS_VALIDOS, NA_real_, D2)) %>% 
     select(id_parlamentar, D1, D2)
   
-  return(results)
+  return(parlamentares_governismo)
 }
