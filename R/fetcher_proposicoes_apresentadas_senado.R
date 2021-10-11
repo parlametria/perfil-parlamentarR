@@ -25,13 +25,13 @@ fetcher_proposicoes_em_intervalo_senado <-
       data <- xml2::xml_find_all(xml, ".//Materia") %>%
         map_df(function(x) {
           list(
-            id = xml2::xml_find_first(x, ".//IdentificacaoMateria/CodigoMateria") %>%
+            id = xml2::xml_find_first(x, ".//Codigo") %>%
               xml2::xml_text(),
-            sigla_tipo = xml2::xml_find_first(x, ".//IdentificacaoMateria/SiglaSubtipoMateria") %>%
+            sigla_tipo = xml2::xml_find_first(x, ".//Sigla") %>%
               xml2::xml_text(),
-            numero = xml2::xml_find_first(x, ".//IdentificacaoMateria/NumeroMateria") %>%
+            numero = xml2::xml_find_first(x, ".//Numero") %>%
               xml2::xml_text(),
-            ano = xml2::xml_find_first(x, ".//IdentificacaoMateria/AnoMateria") %>%
+            ano = xml2::xml_find_first(x, ".//Ano") %>%
               xml2::xml_text()
           )
         })
