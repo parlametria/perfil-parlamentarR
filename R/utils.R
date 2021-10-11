@@ -73,10 +73,12 @@ extract_text_from_pdf_url <- function(url) {
   lista_cargos <- c(.SECRETARIO_1, .SECRETARIO_2, .SECRETARIO_3, .SECRETARIO_4,
                     .VICE_PRESIDENTE_1, .VICE_PRESIDENTE_2, .PRESIDENTE, 
                     .SUPLENTE_SECRETARIO_1, .SUPLENTE_SECRETARIO_2, .SUPLENTE_SECRETARIO_3, .SUPLENTE_SECRETARIO_4,
-                    .SUPLENTE_1, .SUPLENTE_2, .SUPLENTE_3, .SUPLENTE_4)
+                    .SUPLENTE_1, .SUPLENTE_2, .SUPLENTE_3, .SUPLENTE_4) %>% 
+    lapply(tolower) %>% 
+    unlist()
   
   df_check <- df %>% 
-    mutate(check = if_else(cargo %in% lista_cargos, TRUE, FALSE))
+    mutate(check = if_else(tolower(cargo) %in% lista_cargos, TRUE, FALSE))
   
   if(FALSE %in% (df_check %>% pull(check))) {
     stop("Dataframe contém cargo de mesa inválido")
