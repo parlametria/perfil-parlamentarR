@@ -53,7 +53,8 @@ fetch_comissao_info <- function(sigla, casa) {
   if (tolower(casa) == "camara") {
     return(fetch_comissao_info_camara(sigla))
   } else if (tolower(casa) == "senado") {
-    return(fetch_comissao_info_senado(sigla))
+    orgaos_senado <- agoradigital::fetch_orgaos_senado()
+    return(fetch_comissao_info_senado(sigla, orgaos_senado))
   } else {
     stop("Argumento 'casa' inválido.")
   }
@@ -115,5 +116,5 @@ processa_comissoes_e_composicoes <- function(casa = NULL) {
   comissoes <- lista_comissao %>%
     dplyr::select(id = comissao_id, casa, sigla, nome = nome_comissao)
   
-  return(list(comissoes, composicao_comissoes))
+  return(list(comissoes = comissoes, composicao_comissoes = composicao_comissoes))
 }
