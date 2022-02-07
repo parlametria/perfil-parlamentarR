@@ -10,16 +10,15 @@ fetch_comissoes_composicao_senado <- function() {
   # devtools::install_github('analytics-ufcg/leggoR', force = T)
   
   comissoes <- agoradigital::fetch_all_composicao_comissao() %>% 
-    dplyr::mutate(id_senado = stringr::str_match(foto, "fotos-oficiais/senador(.*?).jpg")[,2]) %>% 
     dplyr::filter(casa == "senado") %>% 
-    dplyr::filter(nome != "", nome != "VAGO", id_senado != "") %>%
+    dplyr::filter(nome != "", nome != "VAGO", id != "") %>%
     dplyr::mutate(cargo = dplyr::if_else(is.na(cargo), 
                                          situacao,
                                          cargo)) %>% 
     dplyr::mutate(cargo = dplyr::if_else(cargo == "RELATOR",
                                          situacao,
                                          cargo)) %>% # Checagem adicional que irá sair quando o erro da API (Senado) for corrigido 
-    dplyr::select(id = id_senado, nome, cargo, situacao, sigla, casa) %>% 
+    dplyr::select(id, nome, cargo, situacao, sigla, casa) %>% 
     dplyr::distinct()
   
   return(comissoes)
@@ -28,25 +27,31 @@ fetch_comissoes_composicao_senado <- function() {
 #' @title Recupera informações da Comissão no Senado Federal
 #' @description Utiliza o rcongresso para recuperar informações sobre uma Comissão específica no Senado
 #' @param sigla Sigla da Comissão
+#' @param orgaos_senado Dataframe com o mapeamento sigla para id
 #' @return Dataframe com informações da Comissão
 #' @examples
-#' fetch_comissao_info_senado("CAE")
+#' fetch_comissao_info_senado("CAE", orgaos_senado)
 #' @export
-fetch_comissao_info_senado <- function(sigla) {
+fetch_comissao_info_senado <- function(sigla_arg, orgaos_senado) {
   library(tidyverse)
   
-  url <- paste0("https://legis.senado.leg.br/dadosabertos/comissao/", sigla)
-  
   comissao <- tryCatch({
+    comissao_id <- orgaos_senado %>% 
+      filter(sigla == sigla_arg) %>% 
+      head(1) %>% 
+      pull(id)
+    
+    url <- paste0("https://legis.senado.leg.br/dadosabertos/composicao/comissao/", comissao_id)
+    
     xml <- RCurl::getURL(url) %>% xml2::read_xml()
-    data <- xml2::xml_find_all(xml, ".//COLEGIADO_ROW") %>%
+    data <- xml2::xml_find_all(xml, ".//ComposicaoComissao/IdentificacaoComissao") %>% 
       map_df(function(x) {
         list(
-          comissao_id = xml2::xml_find_first(x, ".//CODIGO") %>% 
+          comissao_id = xml2::xml_find_first(x, ".//CodigoComissao") %>% 
             xml2::xml_text(),
-          sigla = xml2::xml_find_first(x, ".//SGL_COLEGIADO") %>% 
+          sigla = xml2::xml_find_first(x, ".//SiglaComissao") %>% 
             xml2::xml_text(),
-          nome_comissao = xml2::xml_find_first(x, ".//COLEGIADO") %>% 
+          nome_comissao = xml2::xml_find_first(x, ".//NomeComissao") %>% 
             xml2::xml_text()
         )
       }) %>% 
@@ -54,7 +59,7 @@ fetch_comissao_info_senado <- function(sigla) {
       dplyr::select(comissao_id, nome_comissao)
   }, error = function(e) {
     data <- tribble(
-      ~ comissao_id, ~ sigla, ~ nome_comissao)
+      ~ comissao_id, ~ nome_comissao)
     return(data)
   })
   
